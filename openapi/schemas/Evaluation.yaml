@@ -1,0 +1,75 @@
+# Para el mock de /evaluate mantenemos un shape simple
+# pero suficientemente realista. Tu spec actual define 'data' (object).
+# Aquí lo acotamos para que Prism genere algo útil.
+EvaluationInput:
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: object
+      required: [brandId, assetType, assetUrl]
+      additionalProperties: false
+      properties:
+        brandId:
+          $ref: './Common.yaml#/BrandId'
+        assetType:
+          type: string
+          enum: [IMAGE, VIDEO]
+        assetUrl:
+          type: string
+          format: uri
+        idempotencyKey:
+          type: string
+          maxLength: 64
+  example:
+    data:
+      brandId: "00000000-0000-4000-8000-000000000001"
+      assetType: "IMAGE"
+      assetUrl: "https://cdn.example.com/tmp/banner.png"
+      idempotencyKey: "idem_123"
+
+EvaluationResult:
+  type: object
+  required: [result, score]
+  properties:
+    result:
+      type: string
+      enum: [APPROVE, WARN, REJECT]
+      description: Decision simplificada para mocks
+    score:
+      type: number
+      minimum: 0
+      maximum: 100
+      description: Trust score total simplificado para mocks
+    # Campos opcionales para futura expansión, sin romper al front actual
+    details:
+      type: object
+      properties:
+        scorecardId:
+          type: string
+          example: "sc_01"
+        scores:
+          type: object
+          properties:
+            brandFit: { type: integer, minimum: 0, maximum: 100 }
+            visualQuality: { type: integer, minimum: 0, maximum: 100 }
+            clarity: { type: integer, minimum: 0, maximum: 100 }
+            safety: { type: integer, minimum: 0, maximum: 100 }
+            trust: { type: integer, minimum: 0, maximum: 100 }
+        violations:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string, example: "v1" }
+              code: { type: string, example: "LOGO_CLEARSPACE" }
+              message: { type: string, example: "Clear-space < 4%" }
+              severity: { type: string, enum: [LOW, MEDIUM, HIGH, CRITICAL], example: "MEDIUM" }
+  example:
+    result: "APPROVE"
+    score: 84
+    details:
+      scorecardId: "sc_01"
+      scores: { brandFit: 82, visualQuality: 78, clarity: 80, safety: 95, trust: 84 }
+      violations: []
+

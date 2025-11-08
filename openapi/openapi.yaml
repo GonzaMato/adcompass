@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: AdCompass API
+  description: API for AdCompass application
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Next.js API Gateway (proxy to mock or real backend)
+  - url: http://localhost:4010
+    description: Mock server (Prism)
+  - url: http://localhost:8080
+    description: Real backend server
+
+paths:
+  /brands:
+    $ref: './paths/brands.yaml#/list'
+  /brands/{id}:
+    $ref: './paths/brands.yaml#/byId'
+  /evaluate:
+    $ref: './paths/evaluate.yaml#/evaluate'
+
+components:
+  schemas:
+    # Common types
+    Error:
+      $ref: './schemas/Common.yaml#/Error'
+    BrandId:
+      $ref: './schemas/Common.yaml#/BrandId'
+    Timestamp:
+      $ref: './schemas/Common.yaml#/Timestamp'
+    HexColor:
+      $ref: './schemas/Common.yaml#/HexColor'
+    
+    # Brand related
+    Brand:
+      $ref: './schemas/Brand.yaml#/Brand'
+    BrandInput:
+      $ref: './schemas/Brand.yaml#/BrandInput'
+    
+    # Design elements
+    Logo:
+      $ref: './schemas/Logo.yaml#/Logo'
+    Color:
+      $ref: './schemas/Color.yaml#/Color'
+    
+    # Evaluation
+    EvaluationInput:
+      $ref: './schemas/Evaluation.yaml#/EvaluationInput'
+    EvaluationResult:
+      $ref: './schemas/Evaluation.yaml#/EvaluationResult'

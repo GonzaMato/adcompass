@@ -1,0 +1,76 @@
+Logo:
+  type: object
+  required: [type, url, mime]
+  properties:
+    id:
+      type: string
+      description: Logo identifier (mocked)
+      example: "lg_01"
+    type:
+      type: string
+      enum: [primary, stacked, mark-only, mono, inverted]
+      example: "primary"
+    url:
+      type: string
+      format: uri
+      example: "https://cdn.example.com/brands/belora/logo-primary.svg"
+    mime:
+      type: string
+      enum: ["image/svg+xml","image/png"]
+      example: "image/svg+xml"
+    sizeBytes:
+      type: integer
+      minimum: 1
+      maximum: 5242880   # 5MB
+      example: 84231
+    widthPx:
+      type: integer
+      minimum: 1
+      example: 1024
+    heightPx:
+      type: integer
+      minimum: 1
+      example: 256
+    minClearSpaceRatio:
+      type: number
+      minimum: 0
+      maximum: 0.2
+      example: 0.04
+    allowedPositions:
+      type: array
+      items:
+        type: string
+        enum: [top-left, top-right, bottom-left, bottom-right, center]
+      example: ["bottom-right","top-left"]
+    bannedBackgrounds:
+      type: array
+      items:
+        type: string
+        description: Simple labels o color:* HEX
+      example: ["photo-busy","color:#FF0000"]
+    monochrome:
+      type: object
+      properties:
+        allowed:
+          type: boolean
+          example: true
+        hex:
+          $ref: './Common.yaml#/HexColor'
+      example: { allowed: true, hex: "#111111" }
+    invertOnDark:
+      type: boolean
+      example: true
+  example:
+    id: "lg_01"
+    type: "primary"
+    url: "https://cdn.example.com/brands/belora/logo-primary.svg"
+    mime: "image/svg+xml"
+    sizeBytes: 84231
+    widthPx: 1024
+    heightPx: 256
+    minClearSpaceRatio: 0.04
+    allowedPositions: ["bottom-right","top-left"]
+    bannedBackgrounds: ["photo-busy","color:#FF0000"]
+    monochrome: { allowed: true, hex: "#111111" }
+    invertOnDark: true
+
