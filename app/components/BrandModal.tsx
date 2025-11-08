@@ -17,6 +17,8 @@ interface LogoWithFile {
   file: File | null;
   preview?: string;
   invertOnDark?: boolean;
+  existingUrl?: string; // For edit mode
+  isExisting?: boolean; // To distinguish between existing and new logos
 }
 
 export const BrandModal: React.FC<BrandModalProps> = ({
@@ -50,6 +52,21 @@ export const BrandModal: React.FC<BrandModalProps> = ({
       setDescription(brand.description || '');
       setColors(brand.colors || []);
       setTaglines(brand.taglinesAllowed || []);
+      
+      // Load existing logos
+      if (brand.logos && brand.logos.length > 0) {
+        const existingLogos: LogoWithFile[] = brand.logos.map(logo => ({
+          type: logo.type as 'primary' | 'stacked' | 'mark-only' | 'mono' | 'inverted',
+          file: null,
+          preview: logo.url,
+          invertOnDark: logo.invertOnDark || false,
+          existingUrl: logo.url,
+          isExisting: true
+        }));
+        setLogos(existingLogos);
+      } else {
+        setLogos([]);
+      }
     } else {
       setName('');
       setDescription('');
@@ -67,13 +84,20 @@ export const BrandModal: React.FC<BrandModalProps> = ({
       return;
     }
 
-    if (mode === 'create' && logos.length === 0) {
+    if (logos.length === 0) {
       setError('Debes agregar al menos un logo');
       return;
     }
 
+    // In create mode, all logos must have files
+    // In edit mode, only new logos need files (existing ones are already uploaded)
     if (mode === 'create' && logos.some(l => !l.file)) {
       setError('Todos los logos deben tener un archivo');
+      return;
+    }
+    
+    if (mode === 'edit' && logos.some(l => !l.isExisting && !l.file)) {
+      setError('Los logos nuevos deben tener un archivo');
       return;
     }
 
@@ -233,13 +257,42 @@ export const BrandModal: React.FC<BrandModalProps> = ({
               {colors.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {colors.map((color, index) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-neutral-800 rounded-lg">
-                      <div className="w-10 h-10 rounded border-2 border-neutral-600" style={{ backgroundColor: color.hex }} />
-                      <div className="flex-1 text-sm">
-                        <div className="text-white font-mono">{color.hex}</div>
-                        {color.role && <div className="text-neutral-400">{color.role}</div>}
+                    <div key={index} className="flex items-center gap-3 p-3 bg-neutral-800 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-12 h-12 rounded-lg border-2 border-neutral-600 shadow-md" 
+                          style={{ backgroundColor: color.hex }} 
+                          title={color.hex}
+                        />
+                        {color.darkVariant && (
+                          <div 
+                            className="w-12 h-12 rounded-lg border-2 border-neutral-600 shadow-md" 
+                            style={{ backgroundColor: color.darkVariant }} 
+                            title={`Dark variant: ${color.darkVariant}`}
+                          />
+                        )}
                       </div>
-                      <button type="button" onClick={() => removeColor(index)} className="text-red-400 hover:text-red-300">
+                      <div className="flex-1 text-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-white font-mono font-semibold">{color.hex}</span>
+                          {color.darkVariant && (
+                            <span className="text-neutral-400 font-mono text-xs">→ {color.darkVariant}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {color.role && (
+                            <span className="px-2 py-0.5 bg-purple-900/50 text-purple-300 rounded text-xs">
+                              {color.role}
+                            </span>
+                          )}
+                          {color.allowAsBackground && (
+                            <span className="px-2 py-0.5 bg-green-900/50 text-green-300 rounded text-xs">
+                              Fondo permitido
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button type="button" onClick={() => removeColor(index)} className="text-red-400 hover:text-red-300 transition-colors">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -282,11 +335,21 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                   {logos.map((logo, index) => (
                     <div key={index} className="flex items-center gap-3 p-2 bg-neutral-800 rounded-lg">
                       <div className="w-16 h-16 bg-neutral-700 rounded flex items-center justify-center overflow-hidden">
-                        {logo.preview && <img src={logo.preview} alt="Logo preview" className="max-w-full max-h-full object-contain" />}
+                        {logo.preview && <img src={logo.preview} alt="Logo preview" className="max-w-full max-h-full object-contain p-1" />}
                       </div>
                       <div className="flex-1 text-sm">
-                        <div className="text-white">{logo.file?.name}</div>
-                        <div className="text-neutral-400">{logo.type} • {(logo.file?.size || 0) / 1024} KB</div>
+                        <div className="text-white">
+                          {logo.isExisting ? (
+                            <span>Logo existente ({logo.type})</span>
+                          ) : (
+                            logo.file?.name
+                          )}
+                        </div>
+                        <div className="text-neutral-400">
+                          {logo.type}
+                          {logo.file && ` • ${(logo.file.size / 1024).toFixed(1)} KB`}
+                          {logo.invertOnDark && ' • Invierte en oscuro'}
+                        </div>
                       </div>
                       <button type="button" onClick={() => removeLogo(index)} className="text-red-400 hover:text-red-300">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
