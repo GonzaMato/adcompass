@@ -73,12 +73,14 @@ export default function DemoPage() {
     setIsModalOpen(true);
   };
 
-  const handleSaveBrand = async (brandData: Partial<Brand>) => {
+  const handleSaveBrand = async (formData: FormData) => {
     try {
       if (modalMode === 'create') {
-        await brandsAPI.create(brandData);
-      } else if (brandData.id) {
-        await brandsAPI.update(brandData.id, brandData);
+        await brandsAPI.create(formData);
+      } else {
+        // Edit mode would need a different approach
+        // For now, we only support create with files
+        throw new Error('La edición de marcas aún no está implementada');
       }
 
       // Refresh brands list
