@@ -30,3 +30,13 @@ export class DatabaseError extends Error {
   }
 }
 
+export class NotFoundError extends Error {
+  code: string;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'NotFoundError';
+    this.code = 'NOT_FOUND';
+  }
+}
+

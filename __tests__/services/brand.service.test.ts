@@ -2,9 +2,19 @@ import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { BrandService } from '../../services/brand.service';
 import { BrandRepository } from '../../repositories/brand.repository';
 import { StorageService } from '../../services/storage.service';
-import { ValidationError } from '../../lib/errors';
+import { ValidationError, NotFoundError } from '../../lib/errors';
 
 // Mock dependencies
+let consoleErrorSpy: jest.SpyInstance;
+
+beforeAll(() => {
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  consoleErrorSpy.mockRestore();
+});
+
 jest.mock('../../repositories/brand.repository');
 jest.mock('../../services/storage.service');
 
@@ -16,6 +26,7 @@ describe('BrandService', () => {
   beforeEach(() => {
     mockRepository = {
       createWithRelations: jest.fn(),
+      updateWithRelations: jest.fn(),
       findById: jest.fn(),
       findAll: jest.fn(),
       delete: jest.fn(),
@@ -268,6 +279,119 @@ describe('BrandService', () => {
       };
 
       await expect(brandService.createBrand(input)).rejects.toThrow(ValidationError);
+    });
+  });
+
+  describe('updateBrand', () => {
+    it('should update brand kit successfully', async () => {
+      const id = 'test-brand-id';
+      const input = {
+        colors: [{ hex: '#1A5E63' }],
+        logos: [{ type: 'primary' as const }],
+        taglinesAllowed: ['New tagline'],
+        logoFiles: [
+          {
+            name: 'logo.svg',
+            type: 'image/svg+xml',
+            size: 1000,
+            buffer: Buffer.from('test'),
+          },
+        ],
+      };
+
+      // brand exists
+      (mockRepository.findById as jest.Mock).mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date('2025-01-01T00:00:00Z'),
+        updatedAt: new Date('2025-01-01T00:00:00Z'),
+        colors: [], logos: [], taglines: [],
+      } as any);
+
+      mockStorage.uploadLogo.mockResolvedValue({
+        url: 'https://storage.googleapis.com/bucket/brands/test-brand-id/logo.svg',
+        sizeBytes: 1000,
+        mime: 'image/svg+xml',
+      });
+
+      mockRepository.updateWithRelations.mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date('2025-01-01T00:00:00Z'),
+        updatedAt: new Date('2025-01-01T01:00:00Z'),
+        colors: [{ id: 1, brandId: id, role: null, hex: '#1A5E63', darkVariant: null, allowAsBackground: true }],
+        logos: [{
+          id: 1,
+          brandId: id,
+          type: 'primary',
+          url: 'https://storage.googleapis.com/bucket/brands/test-brand-id/logo.svg',
+          mime: 'image/svg+xml',
+          sizeBytes: 1000,
+          widthPx: null,
+          heightPx: null,
+          minClearSpaceRatio: null,
+          allowedPositions: null,
+          bannedBackgrounds: null,
+          monochrome: null,
+          invertOnDark: null,
+        }],
+        taglines: [{ id: 1, brandId: id, text: 'New tagline' }],
+      } as any);
+
+      const result = await brandService.updateBrand(id, input);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(id);
+      expect(mockStorage.uploadLogo).toHaveBeenCalledTimes(1);
+      expect(mockRepository.updateWithRelations).toHaveBeenCalledTimes(1);
+      expect(mockRepository.updateWithRelations).toHaveBeenCalledWith(id, expect.objectContaining({
+        colors: input.colors,
+        taglines: input.taglinesAllowed,
+      }));
+    });
+
+    it('should return null when brand does not exist', async () => {
+      const id = 'missing-id';
+      (mockRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(brandService.updateBrand(id, {
+        logos: [{ type: 'primary' as const }],
+        logoFiles: [{
+          name: 'logo.svg',
+          type: 'image/svg+xml',
+          size: 1000,
+          buffer: Buffer.from('test'),
+        }],
+      })).rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw ValidationError when logos/files count mismatch', async () => {
+      const id = 'brand';
+      await expect(brandService.updateBrand(id, {
+        logos: [{ type: 'primary' as const }, { type: 'stacked' as const }],
+        logoFiles: [{
+          name: 'logo.svg',
+          type: 'image/svg+xml',
+          size: 1000,
+          buffer: Buffer.from('test'),
+        }],
+      } as any)).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError on invalid color hex', async () => {
+      const id = 'brand';
+      await expect(brandService.updateBrand(id, {
+        colors: [{ hex: 'invalid' } as any],
+        logos: [{ type: 'primary' as const }],
+        logoFiles: [{
+          name: 'logo.svg',
+          type: 'image/svg+xml',
+          size: 1000,
+          buffer: Buffer.from('test'),
+        }],
+      })).rejects.toThrow(ValidationError);
     });
   });
 

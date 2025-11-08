@@ -56,3 +56,12 @@ export function validateLogoFile(file: File): { valid: boolean; error?: string }
   return { valid: true };
 }
 
+// ============================================
+// Update Brand Input (PUT /brands/{id})
+// ============================================
+export const BrandUpdateInputSchema = z.object({
+  colors: z.array(ColorInputSchema).max(12, 'Maximum 12 colors allowed').default([]),
+  logos: z.array(LogoInputSchema).min(1, 'At least one logo is required').max(6, 'Maximum 6 logos allowed').optional(),
+  taglinesAllowed: z.array(z.string().min(1).max(120)).max(50, 'Maximum 50 taglines allowed').default([]),
+});
+

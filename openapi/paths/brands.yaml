@@ -151,4 +151,100 @@ byId:
               $ref: '../schemas/Brand.yaml#/Brand'
       '404':
         description: Brand not found
+  put:
+    summary: Replace BrandKit (colors, logos, taglines) for a brand
+    operationId: updateBrand
+    tags:
+      - brands
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - logos
+            properties:
+              colors:
+                type: string
+                description: JSON array of color objects
+                example: '[{"hex":"#1A5E63","role":"primary","allowAsBackground":true}]'
+              logos:
+                type: string
+                description: JSON array of logo metadata objects (new files required)
+                example: '[{"type":"primary","invertOnDark":true}]'
+              taglinesAllowed:
+                type: string
+                description: JSON array of tagline strings
+                example: '["Vida slow junto al río","Tu refugio natural"]'
+              logoFile0:
+                type: string
+                format: binary
+                description: Logo file 0 (SVG or PNG, max 5MB)
+              logoFile1:
+                type: string
+                format: binary
+                description: Logo file 1 (optional)
+              logoFile2:
+                type: string
+                format: binary
+                description: Logo file 2 (optional)
+              logoFile3:
+                type: string
+                format: binary
+                description: Logo file 3 (optional)
+              logoFile4:
+                type: string
+                format: binary
+                description: Logo file 4 (optional)
+              logoFile5:
+                type: string
+                format: binary
+                description: Logo file 5 (optional)
+          encoding:
+            colors:
+              contentType: application/json
+            logos:
+              contentType: application/json
+            taglinesAllowed:
+              contentType: application/json
+    responses:
+      '200':
+        description: Brand updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Brand.yaml#/Brand'
+      '404':
+        description: Brand not found
+      '422':
+        description: Unprocessable entity (validation failed)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+            examples:
+              invalidHex:
+                summary: Invalid HEX color
+                value:
+                  code: "UNPROCESSABLE_ENTITY"
+                  message: "Invalid HEX color format. Must be #RRGGBB with uppercase letters"
+                  field: "colors.0.hex"
+              mismatchedLogoFiles:
+                summary: Mismatch logos vs files
+                value:
+                  code: "UNPROCESSABLE_ENTITY"
+                  message: "Expected 2 logo files, but received 1"
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
 
