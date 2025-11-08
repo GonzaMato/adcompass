@@ -56,7 +56,7 @@ export default function Home() {
       {/* Hero Section with Spotlight */}
       <section className="h-screen w-full rounded-md flex md:items-center md:justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
         <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
-        <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-20 md:pt-0">
+        <div className="p-4 max-w-5xl mx-auto relative z-10 w-full pt-20 md:pt-0">
           <div className="animate-fade-in text-center mb-8">
             <Badge variant="primary">
               🚀 Built for Hack-Nation&apos;s Global AI Hackathon 2025
@@ -112,7 +112,7 @@ export default function Home() {
 
       {/* Problem Statement */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-neutral-950">
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10">
           <ScrollReveal animation="fade">
             <div className="text-center mb-16">
               <Badge variant="danger">The Problem</Badge>
@@ -180,7 +180,7 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black relative overflow-hidden">
         <BackgroundBeams />
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10">
           <ScrollReveal animation="scale">
             <div className="text-center mb-16">
               <Badge variant="success">The Solution</Badge>
@@ -204,7 +204,7 @@ export default function Home() {
         {/* Simple gradient background without heavy animations */}
         <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-pink-900/20"></div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10">
           <ScrollReveal animation="fade">
             <div className="text-center mb-16">
               <Badge variant="primary">See It In Action</Badge>
@@ -318,7 +318,7 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-black bg-grid-white/[0.05]">
         <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/50 to-black pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10">
           <ScrollReveal animation="fade">
             <div className="text-center mb-16">
               <Badge variant="primary">Powered By</Badge>
