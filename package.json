@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:mock": "prism mock openapi/openapi.yaml -p 4010",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:mock\""
   },
   "dependencies": {
     "clsx": "^2.1.1",

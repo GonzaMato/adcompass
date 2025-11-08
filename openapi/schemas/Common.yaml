@@ -1,0 +1,26 @@
+Error:
+  type: object
+  required: [code, message]
+  properties:
+    code:
+      type: string
+      example: "BAD_REQUEST"
+    message:
+      type: string
+      example: "Missing field: name"
+
+BrandId:
+  type: string
+  format: uuid
+  example: "00000000-0000-4000-8000-000000000001"
+
+Timestamp:
+  type: string
+  format: date-time
+  example: "2025-11-08T15:00:00Z"
+
+HexColor:
+  type: string
+  pattern: "^#[0-9A-F]{6}$"
+  example: "#1A5E63"
+

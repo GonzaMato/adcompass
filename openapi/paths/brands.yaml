@@ -1,0 +1,56 @@
+list:
+  get:
+    summary: List all brands
+    operationId: getBrands
+    tags:
+      - brands
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../schemas/Brand.yaml#/Brand'
+  post:
+    summary: Create a new brand
+    operationId: createBrand
+    tags:
+      - brands
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/Brand.yaml#/BrandInput'
+    responses:
+      '201':
+        description: Brand created successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Brand.yaml#/Brand'
+
+byId:
+  get:
+    summary: Get a brand by ID
+    operationId: getBrandById
+    tags:
+      - brands
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Brand.yaml#/Brand'
+      '404':
+        description: Brand not found
+

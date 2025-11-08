@@ -1,0 +1,85 @@
+BrandInput:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 80
+      description: Brand name
+    description:
+      type: string
+      maxLength: 500
+    colors:
+      type: array
+      minItems: 1
+      maxItems: 12
+      items:
+        $ref: './Color.yaml#/Color'
+    logos:
+      type: array
+      minItems: 1
+      maxItems: 6
+      items:
+        $ref: './Logo.yaml#/Logo'
+    taglinesAllowed:
+      type: array
+      maxItems: 50
+      items:
+        type: string
+        minLength: 1
+        maxLength: 120
+  example:
+    name: "Belora"
+    description: "Marca premium residencial costera. Tranquilidad, naturaleza, elegancia."
+    colors:
+      - { role: "primary", hex: "#1A5E63", darkVariant: "#3E8B90", allowAsBackground: true }
+      - { role: "accent", hex: "#E3C87C", allowAsBackground: true }
+      - { role: "neutral-900", hex: "#111111" }
+      - { role: "neutral-000", hex: "#FFFFFF" }
+    logos:
+      - { id: "lg_01", type: "primary", url: "https://cdn.example.com/brands/belora/logo-primary.svg", mime: "image/svg+xml" }
+    taglinesAllowed:
+      - "Vida slow junto al río"
+      - "Tu refugio natural"
+
+Brand:
+  type: object
+  required: [id, name, createdAt]
+  properties:
+    id:
+      $ref: './Common.yaml#/BrandId'
+    name:
+      type: string
+    description:
+      type: string
+    colors:
+      type: array
+      items:
+        $ref: './Color.yaml#/Color'
+    logos:
+      type: array
+      items:
+        $ref: './Logo.yaml#/Logo'
+    taglinesAllowed:
+      type: array
+      items:
+        type: string
+    createdAt:
+      $ref: './Common.yaml#/Timestamp'
+    updatedAt:
+      $ref: './Common.yaml#/Timestamp'
+  example:
+    id: "00000000-0000-4000-8000-000000000001"
+    name: "Belora"
+    description: "Marca premium residencial costera. Tranquilidad, naturaleza, elegancia."
+    colors:
+      - { role: "primary", hex: "#1A5E63", darkVariant: "#3E8B90", allowAsBackground: true }
+      - { role: "accent", hex: "#E3C87C", allowAsBackground: true }
+    logos:
+      - { id: "lg_01", type: "primary", url: "https://cdn.example.com/brands/belora/logo-primary.svg", mime: "image/svg+xml" }
+    taglinesAllowed:
+      - "Vida slow junto al río"
+    createdAt: "2025-11-08T15:00:00Z"
+    updatedAt: "2025-11-08T15:05:00Z"
+
