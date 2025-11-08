@@ -1,30 +1,36 @@
 BrandInput:
   type: object
-  required: [name]
+  required: [name, logos]
+  description: |
+    Input for creating a brand. Note: When using the API, this is sent as multipart/form-data
+    with logo files. The 'logos' field contains metadata, and actual files are sent as logoFile0, logoFile1, etc.
   properties:
     name:
       type: string
       minLength: 1
       maxLength: 80
-      description: Brand name
+      description: Brand name (must be unique)
     description:
       type: string
       maxLength: 500
+      description: Brand description (optional)
     colors:
       type: array
-      minItems: 1
       maxItems: 12
+      description: Array of brand colors (optional, max 12)
       items:
-        $ref: './Color.yaml#/Color'
+        $ref: './Color.yaml#/ColorInput'
     logos:
       type: array
       minItems: 1
       maxItems: 6
+      description: Array of logo metadata (at least 1 required, max 6)
       items:
-        $ref: './Logo.yaml#/Logo'
+        $ref: './Logo.yaml#/LogoInput'
     taglinesAllowed:
       type: array
       maxItems: 50
+      description: Array of allowed taglines (optional, max 50)
       items:
         type: string
         minLength: 1
@@ -32,37 +38,38 @@ BrandInput:
   example:
     name: "Belora"
     description: "Marca premium residencial costera. Tranquilidad, naturaleza, elegancia."
-    colors:
-      - { role: "primary", hex: "#1A5E63", darkVariant: "#3E8B90", allowAsBackground: true }
-      - { role: "accent", hex: "#E3C87C", allowAsBackground: true }
-      - { role: "neutral-900", hex: "#111111" }
-      - { role: "neutral-000", hex: "#FFFFFF" }
     logos:
-      - { id: "lg_01", type: "primary", url: "https://cdn.example.com/brands/belora/logo-primary.svg", mime: "image/svg+xml" }
+      - { type: "primary", invertOnDark: true }
     taglinesAllowed:
       - "Vida slow junto al río"
       - "Tu refugio natural"
 
 Brand:
   type: object
-  required: [id, name, createdAt]
+  required: [id, name, logos, taglinesAllowed, createdAt, updatedAt]
+  description: Complete brand information including uploaded logos with GCS URLs
   properties:
     id:
       $ref: './Common.yaml#/BrandId'
     name:
       type: string
+      description: Brand name
     description:
       type: string
+      description: Brand description (optional)
     colors:
       type: array
+      description: Array of brand colors
       items:
         $ref: './Color.yaml#/Color'
     logos:
       type: array
+      description: Array of logos with public GCS URLs
       items:
         $ref: './Logo.yaml#/Logo'
     taglinesAllowed:
       type: array
+      description: Array of allowed taglines
       items:
         type: string
     createdAt:
@@ -77,7 +84,7 @@ Brand:
       - { role: "primary", hex: "#1A5E63", darkVariant: "#3E8B90", allowAsBackground: true }
       - { role: "accent", hex: "#E3C87C", allowAsBackground: true }
     logos:
-      - { id: "lg_01", type: "primary", url: "https://cdn.example.com/brands/belora/logo-primary.svg", mime: "image/svg+xml" }
+      - { id: "lg_1", type: "primary", url: "https://storage.googleapis.com/bucket_adcompass/brands/00000000-0000-4000-8000-000000000001/logo-primary.svg", mime: "image/svg+xml", sizeBytes: 84231 }
     taglinesAllowed:
       - "Vida slow junto al río"
     createdAt: "2025-11-08T15:00:00Z"

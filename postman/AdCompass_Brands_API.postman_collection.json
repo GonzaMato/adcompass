@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "adcompass-brands-api-001",
+		"name": "AdCompass - Brands API",
+		"description": "Collection for testing the Brands API endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "List All Brands",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/brands",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "brands"]
+				},
+				"description": "Retrieves a list of all brands"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Brand - Minimal",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "MiMarca",
+							"type": "text",
+							"description": "Brand name (required, 1-80 chars)"
+						},
+						{
+							"key": "colors",
+							"value": "[{\"hex\":\"#1A5E63\",\"allowAsBackground\":true}]",
+							"type": "text",
+							"description": "JSON array of color objects (required, min 1, max 12)"
+						},
+						{
+							"key": "logos",
+							"value": "[{\"type\":\"primary\"}]",
+							"type": "text",
+							"description": "JSON array of logo metadata (required, min 1, max 6)"
+						},
+						{
+							"key": "logoFile0",
+							"type": "file",
+							"src": [],
+							"description": "Logo file (SVG or PNG, max 5MB) - REQUIRED"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/brands",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "brands"]
+				},
+				"description": "Creates a new brand with minimal required fields"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Brand - Complete (Belora)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Belora",
+							"type": "text",
+							"description": "Brand name"
+						},
+						{
+							"key": "description",
+							"value": "Marca premium residencial costera. Tranquilidad, naturaleza, elegancia.",
+							"type": "text",
+							"description": "Brand description (optional, max 500 chars)"
+						},
+						{
+							"key": "colors",
+							"value": "[\n  {\n    \"role\": \"primary\",\n    \"hex\": \"#1A5E63\",\n    \"darkVariant\": \"#3E8B90\",\n    \"allowAsBackground\": true\n  },\n  {\n    \"role\": \"accent\",\n    \"hex\": \"#E3C87C\",\n    \"allowAsBackground\": true\n  },\n  {\n    \"role\": \"neutral-900\",\n    \"hex\": \"#111111\",\n    \"allowAsBackground\": false\n  },\n  {\n    \"role\": \"neutral-000\",\n    \"hex\": \"#FFFFFF\",\n    \"allowAsBackground\": true\n  }\n]",
+							"type": "text",
+							"description": "JSON array of brand colors"
+						},
+						{
+							"key": "logos",
+							"value": "[\n  {\n    \"type\": \"primary\",\n    \"invertOnDark\": true,\n    \"minClearSpaceRatio\": 0.04,\n    \"allowedPositions\": [\"bottom-right\", \"top-left\"],\n    \"bannedBackgrounds\": [\"photo-busy\"],\n    \"monochrome\": {\n      \"allowed\": true,\n      \"hex\": \"#111111\"\n    }\n  },\n  {\n    \"type\": \"stacked\",\n    \"invertOnDark\": false\n  }\n]",
+							"type": "text",
+							"description": "JSON array of logo metadata"
+						},
+						{
+							"key": "taglinesAllowed",
+							"value": "[\"Vida slow junto al río\",\"Tu refugio natural\",\"Conecta con la naturaleza\"]",
+							"type": "text",
+							"description": "JSON array of taglines (optional, max 50)"
+						},
+						{
+							"key": "logoFile0",
+							"type": "file",
+							"src": [],
+							"description": "Primary logo file (SVG or PNG, max 5MB)"
+						},
+						{
+							"key": "logoFile1",
+							"type": "file",
+							"src": [],
+							"description": "Stacked logo file (optional)"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/brands",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "brands"]
+				},
+				"description": "Creates a complete brand with all optional fields"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Brand - Tech Startup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "TechFlow",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Soluciones tecnológicas innovadoras para empresas modernas",
+							"type": "text"
+						},
+						{
+							"key": "colors",
+							"value": "[\n  {\n    \"role\": \"primary\",\n    \"hex\": \"#0066FF\",\n    \"darkVariant\": \"#0052CC\",\n    \"allowAsBackground\": true\n  },\n  {\n    \"role\": \"secondary\",\n    \"hex\": \"#00D4FF\",\n    \"allowAsBackground\": false\n  },\n  {\n    \"role\": \"dark\",\n    \"hex\": \"#1A1A1A\",\n    \"allowAsBackground\": true\n  },\n  {\n    \"role\": \"light\",\n    \"hex\": \"#F5F5F5\",\n    \"allowAsBackground\": true\n  }\n]",
+							"type": "text"
+						},
+						{
+							"key": "logos",
+							"value": "[\n  {\n    \"type\": \"primary\",\n    \"invertOnDark\": true,\n    \"minClearSpaceRatio\": 0.05\n  },\n  {\n    \"type\": \"mark-only\",\n    \"monochrome\": {\n      \"allowed\": true,\n      \"hex\": \"#0066FF\"\n    }\n  },\n  {\n    \"type\": \"inverted\"\n  }\n]",
+							"type": "text"
+						},
+						{
+							"key": "taglinesAllowed",
+							"value": "[\"Innovación sin límites\",\"Tecnología que transforma\"]",
+							"type": "text"
+						},
+						{
+							"key": "logoFile0",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "logoFile1",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "logoFile2",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/brands",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "brands"]
+				},
+				"description": "Example: Tech startup brand with multiple logos"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Brand by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/brands/:id",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "brands", ":id"],
+					"variable": [
+						{
+							"key": "id",
+							"value": "00000000-0000-4000-8000-000000000001",
+							"description": "Brand UUID"
+						}
+					]
+				},
+				"description": "Retrieves a specific brand by its ID"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
+

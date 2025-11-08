@@ -40,8 +40,12 @@ components:
     # Design elements
     Logo:
       $ref: './schemas/Logo.yaml#/Logo'
+    LogoInput:
+      $ref: './schemas/Logo.yaml#/LogoInput'
     Color:
       $ref: './schemas/Color.yaml#/Color'
+    ColorInput:
+      $ref: './schemas/Color.yaml#/ColorInput'
     
     # Evaluation
     EvaluationInput:
