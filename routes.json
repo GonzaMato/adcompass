@@ -1,0 +1,8 @@
+{
+  "comment": "Route configuration for API Gateway. Set 'mock' to use Prism mock server, 'real' to use actual backend.",
+  "GET /brands": "mock",
+  "POST /brands": "mock",
+  "GET /brands/{id}": "mock",
+  "POST /evaluate": "mock"
+}
+

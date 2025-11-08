@@ -1,0 +1,22 @@
+Color:
+  type: object
+  required: [hex]
+  properties:
+    role:
+      type: string
+      description: Optional role
+      example: "primary"
+    hex:
+      $ref: './Common.yaml#/HexColor'
+    darkVariant:
+      $ref: './Common.yaml#/HexColor'
+    allowAsBackground:
+      type: boolean
+      default: true
+      example: true
+  example:
+    role: "primary"
+    hex: "#1A5E63"
+    darkVariant: "#3E8B90"
+    allowAsBackground: true
+

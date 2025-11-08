@@ -1,0 +1,20 @@
+evaluate:
+  post:
+    summary: Evaluate endpoint
+    operationId: evaluate
+    tags:
+      - evaluation
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/Evaluation.yaml#/EvaluationInput'
+    responses:
+      '200':
+        description: Evaluation completed successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Evaluation.yaml#/EvaluationResult'
+

@@ -1,17 +1,144 @@
+# AdCompass
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Mock OpenAPI Gateway
 
-First, run the development server:
+Este proyecto incluye un gateway de desarrollo integrado en Next.js que permite "desmockear" endpoints progresivamente a medida que el backend los implementa, sin cambiar código del frontend.
+
+### Arquitectura
+
+- **OpenAPI Spec** (`openapi/openapi.yaml`) - Contrato único de la API
+- **Mock Server** (Prism en puerto 4010) - Genera respuestas mock desde el OpenAPI spec
+- **Real Backend** (puerto 8080) - Implementación real del backend
+- **Next.js API Routes** (`/api/*`) - Proxy inteligente que rutea a mock o real según configuración
+
+### Quick Start
+
+1. **Instalar dependencias:**
+
+```bash
+npm install
+```
+
+2. **Ejecutar todo junto (Next.js + Mock):**
+
+```bash
+npm run dev:all
+```
+
+Esto levanta:
+- Next.js en `http://localhost:3000` (incluye el proxy en `/api/*`)
+- Prism mock server en `http://localhost:4010`
+
+3. **O ejecutar por separado:**
+
+Terminal 1:
+```bash
+npm run dev:mock
+```
+
+Terminal 2:
+```bash
+npm run dev
+```
+
+### Usar el API Gateway
+
+En tu frontend, consume las rutas así:
+
+```typescript
+// Configuración del cliente API
+const API_BASE_URL = '/api';  // ¡Siempre apunta al proxy de Next.js!
+
+// Ejemplos de uso
+fetch(`${API_BASE_URL}/brands`);
+fetch(`${API_BASE_URL}/brands/123`);
+fetch(`${API_BASE_URL}/evaluate`, { method: 'POST', ... });
+```
+
+El proxy de Next.js decide automáticamente si cada endpoint va a mock o real según la configuración.
+
+### Progressive Unmocking (Desmockeo 1 a 1)
+
+El sistema usa `routes.json` para controlar qué endpoints están en mock vs implementados:
+
+```json
+{
+  "GET /brands": "mock",        // Proxy a Prism
+  "POST /brands": "real",       // Debe estar implementado en Next.js
+  "GET /brands/{id}": "mock",
+  "POST /evaluate": "mock"
+}
+```
+
+#### Workflow de implementación:
+
+1. **Inicialmente todo en "mock"**: El catch-all proxy redirige todo a Prism
+2. **Cuando implementás un endpoint**:
+   - Cambiá en `routes.json`: `"POST /brands": "real"`
+   - Creá el archivo: `app/api/brands/route.ts`
+   - Implementá el handler `export async function POST() { ... }`
+3. **Next.js prioriza rutas específicas** sobre el catch-all automáticamente
+
+**Ejemplo de implementación real:**
+
+```typescript
+// app/api/brands/route.ts
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  // Tu lógica aquí
+  return NextResponse.json({ id: '123', name: body.name });
+}
+```
+
+**¡Importante!** Para que los cambios en `routes.json` tomen efecto, reiniciá el servidor Next.js (`Ctrl+C` y `npm run dev`).
+
+### Variables de Entorno
+
+Puedes personalizar el comportamiento con esta variable en `.env.local`:
+
+- `MOCK_BASE_URL` - URL del mock server (default: `http://localhost:4010`)
+
+Ejemplo `.env.local`:
+
+```bash
+MOCK_BASE_URL=http://localhost:4010
+```
+
+### Endpoints Disponibles
+
+Definidos en `openapi/openapi.yaml`:
+
+- `GET /api/brands` - Listar marcas
+- `POST /api/brands` - Crear marca
+- `GET /api/brands/{id}` - Obtener marca por ID
+- `POST /api/evaluate` - Evaluar
+
+### Ejemplo de Workflow
+
+1. **Día 1:** Todos los endpoints en `routes.json` están en `"mock"`. Frontend trabaja con datos simulados.
+
+2. **Día 3:** Backend implementa `POST /brands`. Cambias en `routes.json`:
+   ```json
+   "POST /brands": "real"
+   ```
+
+3. **Día 5:** Backend implementa `GET /brands`. Cambias en `routes.json`:
+   ```json
+   "GET /brands": "real"
+   ```
+
+4. **Día 7:** Todos los endpoints están en "real". El frontend nunca cambió sus URLs.
+
+## Next.js Development
+
+Run the Next.js development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
