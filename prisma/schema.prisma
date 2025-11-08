@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(80)
+  description String?  @db.VarChar(500)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  colors    Color[]
+  logos     Logo[]
+  taglines  Tagline[]
+
+  @@map("brands")
+}
+
+model Color {
+  id                Int     @id @default(autoincrement())
+  brandId           String  @map("brand_id") @db.Uuid
+  role              String? @db.VarChar(50)
+  hex               String  @db.Char(7) // #RRGGBB
+  darkVariant       String? @map("dark_variant") @db.Char(7)
+  allowAsBackground Boolean @default(true) @map("allow_as_background")
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("colors")
+}
+
+model Logo {
+  id                  Int     @id @default(autoincrement())
+  brandId             String  @map("brand_id") @db.Uuid
+  type                String  @db.VarChar(20) // primary, stacked, mark-only, mono, inverted
+  url                 String  @db.VarChar(500)
+  mime                String  @db.VarChar(30) // image/svg+xml, image/png
+  sizeBytes           Int?    @map("size_bytes")
+  widthPx             Int?    @map("width_px")
+  heightPx            Int?    @map("height_px")
+  minClearSpaceRatio  Float?  @map("min_clear_space_ratio")
+  allowedPositions    Json?   @map("allowed_positions") // array of strings
+  bannedBackgrounds   Json?   @map("banned_backgrounds") // array of strings
+  monochrome          Json?   // {allowed: boolean, hex?: string}
+  invertOnDark        Boolean? @map("invert_on_dark")
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("logos")
+}
+
+model Tagline {
+  id      Int    @id @default(autoincrement())
+  brandId String @map("brand_id") @db.Uuid
+  text    String @db.VarChar(120)
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("taglines")
+}
