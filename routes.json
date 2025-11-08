@@ -3,6 +3,10 @@
   "GET /brands": "real",
   "POST /brands": "real",
   "GET /brands/{id}": "mock",
-  "POST /evaluate": "mock"
+  "POST /evaluate": "mock",
+  "GET /brands/{id}/rules": "real",
+  "POST /brands/{id}/rules": "real",
+  "PUT /brands/{id}/rules": "real",
+  "GET /brands/rules": "real"
 }
 

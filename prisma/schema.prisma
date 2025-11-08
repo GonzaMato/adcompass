@@ -20,6 +20,7 @@ model Brand {
   colors    Color[]
   logos     Logo[]
   taglines  Tagline[]
+  brandRules BrandRules?
 
   @@map("brands")
 }
@@ -65,4 +66,16 @@ model Tagline {
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@map("taglines")
+}
+
+model BrandRules {
+  id        String   @id @default(uuid()) @db.Uuid
+  brandId   String   @unique @db.Uuid
+  rules     Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_rules")
 }
