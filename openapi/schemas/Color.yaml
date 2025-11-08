@@ -1,10 +1,11 @@
-Color:
+ColorInput:
   type: object
   required: [hex]
+  description: Color input for brand creation
   properties:
     role:
       type: string
-      description: Optional role
+      description: Optional role identifier (e.g., "primary", "accent", "neutral-900")
       example: "primary"
     hex:
       $ref: './Common.yaml#/HexColor'
@@ -13,6 +14,30 @@ Color:
     allowAsBackground:
       type: boolean
       default: true
+      description: Whether this color can be used as a background
+      example: true
+  example:
+    role: "primary"
+    hex: "#1A5E63"
+    darkVariant: "#3E8B90"
+    allowAsBackground: true
+
+Color:
+  type: object
+  required: [hex, allowAsBackground]
+  description: Color information in API responses
+  properties:
+    role:
+      type: string
+      description: Optional role identifier
+      example: "primary"
+    hex:
+      $ref: './Common.yaml#/HexColor'
+    darkVariant:
+      $ref: './Common.yaml#/HexColor'
+    allowAsBackground:
+      type: boolean
+      description: Whether this color can be used as a background
       example: true
   example:
     role: "primary"

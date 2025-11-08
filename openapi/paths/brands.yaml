@@ -14,16 +14,74 @@ list:
               items:
                 $ref: '../schemas/Brand.yaml#/Brand'
   post:
-    summary: Create a new brand
+    summary: Create a new brand with logo uploads
     operationId: createBrand
     tags:
       - brands
     requestBody:
       required: true
       content:
-        application/json:
+        multipart/form-data:
           schema:
-            $ref: '../schemas/Brand.yaml#/BrandInput'
+            type: object
+            required:
+              - name
+              - logos
+            properties:
+              name:
+                type: string
+                minLength: 1
+                maxLength: 80
+                description: Brand name
+                example: "Belora"
+              description:
+                type: string
+                maxLength: 500
+                description: Brand description
+                example: "Marca premium residencial costera"
+              colors:
+                type: string
+                description: JSON array of color objects (optional)
+                example: '[{"hex":"#1A5E63","role":"primary","allowAsBackground":true}]'
+              logos:
+                type: string
+                description: JSON array of logo metadata objects
+                example: '[{"type":"primary","invertOnDark":true}]'
+              taglinesAllowed:
+                type: string
+                description: JSON array of tagline strings (optional)
+                example: '["Vida slow junto al río","Tu refugio natural"]'
+              logoFile0:
+                type: string
+                format: binary
+                description: Logo file 0 (SVG or PNG, max 5MB)
+              logoFile1:
+                type: string
+                format: binary
+                description: Logo file 1 (optional)
+              logoFile2:
+                type: string
+                format: binary
+                description: Logo file 2 (optional)
+              logoFile3:
+                type: string
+                format: binary
+                description: Logo file 3 (optional)
+              logoFile4:
+                type: string
+                format: binary
+                description: Logo file 4 (optional)
+              logoFile5:
+                type: string
+                format: binary
+                description: Logo file 5 (optional)
+          encoding:
+            colors:
+              contentType: application/json
+            logos:
+              contentType: application/json
+            taglinesAllowed:
+              contentType: application/json
     responses:
       '201':
         description: Brand created successfully
@@ -31,6 +89,46 @@ list:
           application/json:
             schema:
               $ref: '../schemas/Brand.yaml#/Brand'
+      '400':
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+            examples:
+              missingName:
+                summary: Missing required field
+                value:
+                  code: "BAD_REQUEST"
+                  message: "Missing field: name"
+              invalidHex:
+                summary: Invalid HEX color
+                value:
+                  code: "BAD_REQUEST"
+                  message: "Invalid HEX color format. Must be #RRGGBB with uppercase letters"
+                  field: "colors.0.hex"
+              tooManyLogos:
+                summary: Too many logos
+                value:
+                  code: "BAD_REQUEST"
+                  message: "Maximum 6 logos allowed"
+              fileTooLarge:
+                summary: File size exceeded
+                value:
+                  code: "BAD_REQUEST"
+                  message: "File logo.png exceeds 5MB limit"
+              duplicateName:
+                summary: Brand name already exists
+                value:
+                  code: "BAD_REQUEST"
+                  message: "A brand with this name already exists"
+                  field: "name"
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
 
 byId:
   get:

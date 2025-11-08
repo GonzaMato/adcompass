@@ -1,52 +1,115 @@
-Logo:
+LogoInput:
   type: object
-  required: [type, url, mime]
+  required: [type]
+  description: |
+    Logo metadata for brand creation. The actual logo file is uploaded separately.
+    Files must be SVG or PNG, max 5MB each.
   properties:
-    id:
-      type: string
-      description: Logo identifier (mocked)
-      example: "lg_01"
     type:
       type: string
       enum: [primary, stacked, mark-only, mono, inverted]
+      description: Type of logo
       example: "primary"
-    url:
-      type: string
-      format: uri
-      example: "https://cdn.example.com/brands/belora/logo-primary.svg"
-    mime:
-      type: string
-      enum: ["image/svg+xml","image/png"]
-      example: "image/svg+xml"
-    sizeBytes:
-      type: integer
-      minimum: 1
-      maximum: 5242880   # 5MB
-      example: 84231
-    widthPx:
-      type: integer
-      minimum: 1
-      example: 1024
-    heightPx:
-      type: integer
-      minimum: 1
-      example: 256
     minClearSpaceRatio:
       type: number
       minimum: 0
       maximum: 0.2
+      description: Minimum clear space around logo as ratio of logo size
       example: 0.04
     allowedPositions:
       type: array
       items:
         type: string
         enum: [top-left, top-right, bottom-left, bottom-right, center]
+      description: Allowed positions for logo placement
       example: ["bottom-right","top-left"]
     bannedBackgrounds:
       type: array
       items:
         type: string
-        description: Simple labels o color:* HEX
+      description: Backgrounds where logo should not be used (e.g., "photo-busy", "color:#FF0000")
+      example: ["photo-busy","color:#FF0000"]
+    monochrome:
+      type: object
+      properties:
+        allowed:
+          type: boolean
+          description: Whether monochrome version is allowed
+          example: true
+        hex:
+          $ref: './Common.yaml#/HexColor'
+      description: Monochrome logo settings
+      example: { allowed: true, hex: "#111111" }
+    invertOnDark:
+      type: boolean
+      description: Whether to invert logo on dark backgrounds
+      example: true
+  example:
+    type: "primary"
+    minClearSpaceRatio: 0.04
+    allowedPositions: ["bottom-right","top-left"]
+    bannedBackgrounds: ["photo-busy"]
+    monochrome: { allowed: true, hex: "#111111" }
+    invertOnDark: true
+
+Logo:
+  type: object
+  required: [id, type, url, mime]
+  description: Complete logo information including GCS storage URL
+  properties:
+    id:
+      type: string
+      description: Logo identifier (e.g., "lg_1", "lg_2")
+      example: "lg_1"
+    type:
+      type: string
+      enum: [primary, stacked, mark-only, mono, inverted]
+      description: Type of logo
+      example: "primary"
+    url:
+      type: string
+      format: uri
+      description: Public URL of the logo in Google Cloud Storage
+      example: "https://storage.googleapis.com/bucket_adcompass/brands/uuid/logo.svg"
+    mime:
+      type: string
+      enum: ["image/svg+xml","image/png"]
+      description: MIME type of the logo file
+      example: "image/svg+xml"
+    sizeBytes:
+      type: integer
+      minimum: 1
+      maximum: 5242880   # 5MB
+      description: File size in bytes
+      example: 84231
+    widthPx:
+      type: integer
+      minimum: 1
+      description: Width in pixels (if available)
+      example: 1024
+    heightPx:
+      type: integer
+      minimum: 1
+      description: Height in pixels (if available)
+      example: 256
+    minClearSpaceRatio:
+      type: number
+      minimum: 0
+      maximum: 0.2
+      description: Minimum clear space around logo
+      example: 0.04
+    allowedPositions:
+      type: array
+      items:
+        type: string
+        enum: [top-left, top-right, bottom-left, bottom-right, center]
+      description: Allowed positions for logo placement
+      example: ["bottom-right","top-left"]
+    bannedBackgrounds:
+      type: array
+      items:
+        type: string
+      description: Backgrounds where logo should not be used
       example: ["photo-busy","color:#FF0000"]
     monochrome:
       type: object
@@ -56,14 +119,16 @@ Logo:
           example: true
         hex:
           $ref: './Common.yaml#/HexColor'
+      description: Monochrome logo settings
       example: { allowed: true, hex: "#111111" }
     invertOnDark:
       type: boolean
+      description: Whether to invert logo on dark backgrounds
       example: true
   example:
-    id: "lg_01"
+    id: "lg_1"
     type: "primary"
-    url: "https://cdn.example.com/brands/belora/logo-primary.svg"
+    url: "https://storage.googleapis.com/bucket_adcompass/brands/00000000-0000-4000-8000-000000000001/logo.svg"
     mime: "image/svg+xml"
     sizeBytes: 84231
     widthPx: 1024

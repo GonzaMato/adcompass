@@ -1,23 +1,4 @@
 services:
-  app:
-    image: node:20-alpine
-    working_dir: /app
-    command: sh -c "corepack enable && yarn install && yarn dev"
-    env_file:
-      - .env
-    environment:
-      - MOCK_BASE_URL=http://mock:4010
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - app-node-modules:/app/node_modules
-    depends_on:
-      db:
-        condition: service_healthy
-      mock:
-        condition: service_started
-
   mock:
     image: stoplight/prism:5
     command: mock -h 0.0.0.0 /openapi/openapi.yaml
@@ -29,10 +10,10 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-adcompass}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
-      POSTGRES_DB: ${POSTGRES_DB:-adcompass}
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
