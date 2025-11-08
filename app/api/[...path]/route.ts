@@ -145,40 +145,45 @@ async function proxyRequest(request: NextRequest, pathname: string) {
 // Handle all HTTP methods
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
+  const params = await context.params;
   const pathname = '/' + (params.path?.join('/') || '');
   return proxyRequest(request, pathname);
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
+  const params = await context.params;
   const pathname = '/' + (params.path?.join('/') || '');
   return proxyRequest(request, pathname);
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
+  const params = await context.params;
   const pathname = '/' + (params.path?.join('/') || '');
   return proxyRequest(request, pathname);
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
+  const params = await context.params;
   const pathname = '/' + (params.path?.join('/') || '');
   return proxyRequest(request, pathname);
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
+  const params = await context.params;
   const pathname = '/' + (params.path?.join('/') || '');
   return proxyRequest(request, pathname);
 }

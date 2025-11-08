@@ -5,12 +5,26 @@ services:
     command: sh -c "corepack enable && yarn install && yarn dev"
     env_file:
       - .env
+    environment:
+      - MOCK_BASE_URL=http://mock:4010
+    ports:
+      - "3000:3000"
     volumes:
       - .:/app
       - app-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
+      mock:
+        condition: service_started
+
+  mock:
+    image: stoplight/prism:5
+    command: mock -h 0.0.0.0 /openapi/openapi.yaml
+    ports:
+      - "4010:4010"
+    volumes:
+      - ./openapi:/openapi:ro
 
   db:
     image: postgres:16-alpine

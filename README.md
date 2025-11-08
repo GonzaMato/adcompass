@@ -15,6 +15,27 @@ Este proyecto incluye un gateway de desarrollo integrado en Next.js que permite 
 
 ### Quick Start
 
+#### Opción A: Con Docker (Recomendado)
+
+```bash
+# Levantar todo (Next.js + Mock + Postgres)
+docker compose up
+
+# O en background
+docker compose up -d
+
+# Ver logs
+docker compose logs -f app
+docker compose logs -f mock
+```
+
+Esto levanta:
+- Next.js en `http://localhost:3000` (incluye el proxy en `/api/*`)
+- Prism mock server en `http://localhost:4010`
+- PostgreSQL en `localhost:5432`
+
+#### Opción B: Local (sin Docker)
+
 1. **Instalar dependencias:**
 
 ```bash
