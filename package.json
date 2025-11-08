@@ -11,20 +11,21 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:mock\""
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.24",
+    "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "next": "16.0.1"
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
-    "@stoplight/prism-cli": "^5.8.0",
-    "concurrently": "^8.2.2"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
