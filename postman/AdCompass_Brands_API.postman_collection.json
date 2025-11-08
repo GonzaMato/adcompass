@@ -203,6 +203,56 @@
 				"description": "Retrieves a specific brand by its ID"
 			},
 			"response": []
+		},
+		{
+			"name": "Update BrandKit (PUT) - Replace colors, logos, taglines",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "colors",
+							"value": "[\n  {\"role\":\"primary\",\"hex\":\"#1A5E63\",\"allowAsBackground\":true},\n  {\"role\":\"accent\",\"hex\":\"#E3C87C\",\"allowAsBackground\":true}\n]",
+							"type": "text",
+							"description": "JSON array of color objects (optional, max 12). Use [] to clear."
+						},
+						{
+							"key": "logos",
+							"value": "[{\"type\":\"primary\",\"invertOnDark\":true}]",
+							"type": "text",
+							"description": "JSON array of logo metadata (required, min 1, max 6)"
+						},
+						{
+							"key": "taglinesAllowed",
+							"value": "[\"Vida slow junto al río\",\"Tu refugio natural\"]",
+							"type": "text",
+							"description": "JSON array of taglines (optional, max 50). Use [] to clear."
+						},
+						{
+							"key": "logoFile0",
+							"type": "file",
+							"src": [],
+							"description": "Logo file 0 (SVG or PNG, max 5MB). One file per logos[i]."
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/brands/:id",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "brands", ":id"],
+					"variable": [
+						{
+							"key": "id",
+							"value": "00000000-0000-4000-8000-000000000001",
+							"description": "Brand UUID"
+						}
+					]
+				},
+				"description": "Replaces the BrandKit for a brand. Full replacement of colors, logos and taglines. Requires uploading new logo files matching the logos array size."
+			},
+			"response": []
 		}
 	],
 	"event": [

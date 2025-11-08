@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { DatabaseError } from '../lib/errors';
-import { CreateBrandData, BrandWithRelations } from '../types';
+import { CreateBrandData, UpdateBrandData, BrandWithRelations } from '../types';
 
 export class BrandRepository {
   constructor(private db: PrismaClient = prisma) {}
@@ -138,6 +138,81 @@ export class BrandRepository {
       console.error('Database error in findAll:', error);
       throw new DatabaseError(
         `Failed to fetch brands: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  async updateWithRelations(id: string, data: UpdateBrandData): Promise<BrandWithRelations | null> {
+    try {
+      const brand = await this.db.$transaction(async (tx: any) => {
+        const existing = await tx.brand.findUnique({ where: { id } });
+        if (!existing) {
+          return null;
+        }
+
+        // Replace colors
+        await tx.color.deleteMany({ where: { brandId: id } });
+        if (data.colors && data.colors.length > 0) {
+          await tx.color.createMany({
+            data: data.colors.map((color) => ({
+              brandId: id,
+              role: color.role,
+              hex: color.hex,
+              darkVariant: color.darkVariant,
+              allowAsBackground: color.allowAsBackground ?? true,
+            })),
+          });
+        }
+
+        // Replace logos only if provided (omit to keep existing)
+        if (typeof data.logos !== 'undefined') {
+          await tx.logo.deleteMany({ where: { brandId: id } });
+          if (data.logos && data.logos.length > 0) {
+            await tx.logo.createMany({
+              data: data.logos.map((logo) => ({
+                brandId: id,
+                type: logo.type,
+                url: logo.url,
+                mime: logo.mime,
+                sizeBytes: logo.sizeBytes,
+                widthPx: logo.widthPx,
+                heightPx: logo.heightPx,
+                minClearSpaceRatio: logo.minClearSpaceRatio,
+                allowedPositions: logo.allowedPositions,
+                bannedBackgrounds: logo.bannedBackgrounds,
+                monochrome: logo.monochrome,
+                invertOnDark: logo.invertOnDark,
+              })),
+            });
+          }
+        }
+
+        // Replace taglines
+        await tx.tagline.deleteMany({ where: { brandId: id } });
+        if (data.taglines && data.taglines.length > 0) {
+          await tx.tagline.createMany({
+            data: data.taglines.map((text) => ({
+              brandId: id,
+              text,
+            })),
+          });
+        }
+
+        // Trigger updatedAt
+        await tx.brand.update({ where: { id }, data: {} });
+
+        // Return full brand
+        return tx.brand.findUnique({
+          where: { id },
+          include: { colors: true, logos: true, taglines: true },
+        });
+      });
+
+      return brand;
+    } catch (error) {
+      console.error('Database error in updateWithRelations:', error);
+      throw new DatabaseError(
+        `Failed to update brand: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

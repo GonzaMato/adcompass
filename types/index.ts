@@ -11,8 +11,10 @@
 // Brand types
 export type {
   CreateBrandDTO,
+  UpdateBrandDTO,
   BrandResponse,
   CreateBrandData,
+  UpdateBrandData,
   BrandWithRelations,
   LogoFile,
 } from './brand.types';

@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { BrandInputSchema, ColorInputSchema, LogoInputSchema } from '../../lib/validators/brand.validator';
+import { BrandInputSchema, BrandUpdateInputSchema, ColorInputSchema, LogoInputSchema } from '../../lib/validators/brand.validator';
 
 describe('Brand API Validation', () => {
   describe('BrandInputSchema', () => {
@@ -89,6 +89,36 @@ describe('Brand API Validation', () => {
       };
 
       const result = BrandInputSchema.safeParse(invalidInput);
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('BrandUpdateInputSchema', () => {
+    it('should validate a valid update input', () => {
+      const valid = {
+        colors: [{ hex: '#1A5E63' }],
+        logos: [{ type: 'primary' }],
+        taglinesAllowed: ['ok'],
+      };
+      const result = BrandUpdateInputSchema.safeParse(valid);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject when logos is empty', () => {
+      const invalid = {
+        colors: [{ hex: '#1A5E63' }],
+        logos: [],
+      };
+      const result = BrandUpdateInputSchema.safeParse(invalid);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject invalid color hex', () => {
+      const invalid = {
+        colors: [{ hex: 'bad' }],
+        logos: [{ type: 'primary' }],
+      };
+      const result = BrandUpdateInputSchema.safeParse(invalid);
       expect(result.success).toBe(false);
     });
   });
