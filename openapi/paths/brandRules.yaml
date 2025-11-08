@@ -1,0 +1,116 @@
+brandRulesByBrand:
+  get:
+    summary: Get rules for a brand
+    operationId: getBrandRules
+    tags: [brands]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          $ref: '../schemas/Common.yaml#/BrandId'
+    responses:
+      '200':
+        description: Brand rules
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/BrandRules.yaml#/BrandRules'
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+  post:
+    summary: Create rules for a brand
+    operationId: createBrandRules
+    tags: [brands]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          $ref: '../schemas/Common.yaml#/BrandId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/BrandRules.yaml#/BrandRulesInput'
+        application/x-yaml:
+          schema:
+            type: string
+            description: YAML payload of BrandRulesInput
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/BrandRules.yaml#/BrandRules'
+      '409':
+        description: Rules already exist for brand
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+      '422':
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+  put:
+    summary: Update rules for a brand
+    operationId: updateBrandRules
+    tags: [brands]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          $ref: '../schemas/Common.yaml#/BrandId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/BrandRules.yaml#/BrandRulesInput'
+        application/x-yaml:
+          schema:
+            type: string
+            description: YAML payload of BrandRulesInput
+    responses:
+      '200':
+        description: Updated
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/BrandRules.yaml#/BrandRules'
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+      '422':
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+
+brandRulesListAll:
+  get:
+    summary: List all brand rules
+    operationId: listBrandRules
+    tags: [brands]
+    responses:
+      '200':
+        description: List of brand rules
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/BrandRules.yaml#/BrandRulesList'
+

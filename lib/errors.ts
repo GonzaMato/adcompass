@@ -40,3 +40,13 @@ export class NotFoundError extends Error {
   }
 }
 
+export class ConflictError extends Error {
+  code: string;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'ConflictError';
+    this.code = 'CONFLICT';
+  }
+}
+

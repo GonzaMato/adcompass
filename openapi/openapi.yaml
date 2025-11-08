@@ -16,6 +16,10 @@ paths:
     $ref: './paths/brands.yaml#/list'
   /brands/{id}:
     $ref: './paths/brands.yaml#/byId'
+  /brands/{id}/rules:
+    $ref: './paths/brandRules.yaml#/brandRulesByBrand'
+  /brands/rules:
+    $ref: './paths/brandRules.yaml#/brandRulesListAll'
   /evaluate:
     $ref: './paths/evaluate.yaml#/evaluate'
 
@@ -52,3 +56,11 @@ components:
       $ref: './schemas/Evaluation.yaml#/EvaluationInput'
     EvaluationResult:
       $ref: './schemas/Evaluation.yaml#/EvaluationResult'
+
+    # Brand rules
+    BrandRulesInput:
+      $ref: './schemas/BrandRules.yaml#/BrandRulesInput'
+    BrandRules:
+      $ref: './schemas/BrandRules.yaml#/BrandRules'
+    BrandRulesList:
+      $ref: './schemas/BrandRules.yaml#/BrandRulesList'
