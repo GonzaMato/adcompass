@@ -39,10 +39,6 @@ export class EvaluationService {
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
       };
-      const apiKey = process.env.N8N_API_KEY;
-      if (apiKey) {
-        (headers as any).Authorization = `Bearer ${apiKey}`;
-      }
 
       const upstreamResponse = await fetch(n8nUrl, {
         method: 'POST',
