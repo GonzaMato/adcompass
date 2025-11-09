@@ -47,12 +47,12 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
       {/* Header */}
       <ScrollReveal animation="fade">
         <div className="text-center mb-8">
-          <Badge variant="primary">Demo Interactivo</Badge>
+          <Badge variant="primary">Interactive Demo</Badge>
           <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-white">
-            Selecciona una Marca
+            Select a Brand
           </h1>
           <p className="mt-4 text-xl text-neutral-400 max-w-2xl mx-auto">
-            Elige una marca para comenzar a evaluar tus ads generados por IA
+            Choose a brand to start evaluating your AI-generated ads
           </p>
         </div>
       </ScrollReveal>
@@ -67,7 +67,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
             <svg className="w-5 h-5 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Crear Nueva Marca
+            Create New Brand
           </button>
         </div>
       </ScrollReveal>
@@ -77,7 +77,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
         <div className="text-center py-20">
           <div className="inline-flex items-center gap-3">
             <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-neutral-400 text-lg">Cargando marcas...</span>
+            <span className="text-neutral-400 text-lg">Loading brands...</span>
           </div>
         </div>
       )}
@@ -91,13 +91,13 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
                 <svg className="w-16 h-16 mx-auto mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <h3 className="text-xl font-semibold text-red-400 mb-2">Error al cargar marcas</h3>
+                <h3 className="text-xl font-semibold text-red-400 mb-2">Error loading brands</h3>
                 <p className="text-neutral-400 mb-4">{error}</p>
                 <button
                   onClick={onRetry}
                   className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                 >
-                  Reintentar
+                  Retry
                 </button>
               </div>
             </Card>
@@ -133,7 +133,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
                         <button
                           onClick={(e) => onEditBrand(brand, e)}
                           className="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center transition-colors shadow-lg"
-                          title="Editar marca"
+                          title="Edit brand"
                         >
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -147,7 +147,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
                               ? 'bg-red-800 opacity-60 cursor-not-allowed'
                               : 'bg-red-600 hover:bg-red-700'
                           }`}
-                          title="Eliminar marca"
+                          title="Delete brand"
                         >
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-8 0h10" />
@@ -219,7 +219,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
                                   />
                                 ))}
                               </div>
-                              <span>{brand.colors.length} colores</span>
+                              <span>{brand.colors.length} colors</span>
                             </div>
                           )}
                           {brand.logos && brand.logos.length > 0 && (
@@ -248,7 +248,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
                     : 'bg-neutral-800 text-neutral-500 cursor-not-allowed'
                 }`}
               >
-                <span>Continuar con {selectedBrand?.name || 'marca seleccionada'}</span>
+                <span>Continue with {selectedBrand?.name || 'selected brand'}</span>
                 <svg 
                   className={`w-5 h-5 transition-transform ${selectedBrand ? 'group-hover:translate-x-1' : ''}`} 
                   fill="none" 
@@ -261,7 +261,7 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
               
               {!selectedBrand && (
                 <p className="mt-4 text-sm text-neutral-500">
-                  Selecciona una marca para continuar
+                  Select a brand to continue
                 </p>
               )}
             </div>
@@ -276,8 +276,8 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
             <svg className="w-16 h-16 mx-auto mb-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <h3 className="text-xl font-semibold text-neutral-400 mb-2">No hay marcas disponibles</h3>
-            <p className="text-neutral-500">Agrega marcas para comenzar a evaluar ads</p>
+            <h3 className="text-xl font-semibold text-neutral-400 mb-2">No brands available</h3>
+            <p className="text-neutral-500">Add brands to start evaluating ads</p>
           </div>
         </ScrollReveal>
       )}

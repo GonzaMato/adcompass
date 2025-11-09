@@ -87,24 +87,24 @@ export const BrandModal: React.FC<BrandModalProps> = ({
     e.preventDefault();
     
     if (!name.trim()) {
-      setError('El nombre es requerido');
+      setError('Name is required');
       return;
     }
 
     if (logos.length === 0) {
-      setError('Debes tener al menos un logo');
+      setError('You must have at least one logo');
       return;
     }
 
     // In create mode, all logos must have files
     if (mode === 'create' && logos.some(l => !l.file)) {
-      setError('Todos los logos deben tener un archivo');
+      setError('All logos must have a file');
       return;
     }
     
     // In edit mode, only new logos (not existing) need files
     if (mode === 'edit' && logos.some(l => !l.isExisting && !l.file)) {
-      setError('Los logos nuevos deben tener un archivo');
+      setError('New logos must have a file');
       return;
     }
 
@@ -171,7 +171,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
       await onSave(formData);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al guardar');
+      setError(err instanceof Error ? err.message : 'Error saving');
     } finally {
       setLoading(false);
     }
@@ -179,7 +179,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
 
   const addColor = () => {
     if (!newColor.hex.match(/^#[0-9A-F]{6}$/i)) {
-      setError('El color debe estar en formato HEX (#RRGGBB)');
+      setError('Color must be in HEX format (#RRGGBB)');
       return;
     }
     setColors(prev => [...prev, newColor]);
@@ -196,12 +196,12 @@ export const BrandModal: React.FC<BrandModalProps> = ({
     if (!file) return;
 
     if (!['image/svg+xml', 'image/png'].includes(file.type)) {
-      setError('Solo se permiten archivos SVG o PNG');
+      setError('Only SVG or PNG files are allowed');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('El archivo no puede superar 5MB');
+      setError('File cannot exceed 5MB');
       return;
     }
 
@@ -210,9 +210,9 @@ export const BrandModal: React.FC<BrandModalProps> = ({
       const hasExistingLogos = logos.some(logo => logo.isExisting);
       if (hasExistingLogos) {
         const confirmed = confirm(
-          '⚠️ Al agregar un nuevo logo, deberás subir TODOS los logos que quieras mantener.\n\n' +
-          'Los logos existentes que no vuelvas a subir se eliminarán.\n\n' +
-          '¿Deseas continuar?'
+          '⚠️ When adding a new logo, you must upload ALL logos you want to keep.\n\n' +
+          'Existing logos that you don\'t re-upload will be deleted.\n\n' +
+          'Do you want to continue?'
         );
         if (!confirmed) {
           e.target.value = '';
@@ -243,7 +243,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
 
   const addTagline = () => {
     if (!newTagline.trim()) {
-      setError('El tagline no puede estar vacío');
+      setError('Tagline cannot be empty');
       return;
     }
     setTaglines(prev => [...prev, newTagline.trim()]);
@@ -264,7 +264,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
           <form onSubmit={handleSubmit}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
-                {mode === 'create' ? 'Crear Nueva Marca' : 'Editar Marca'}
+                {mode === 'create' ? 'Create New Brand' : 'Edit Brand'}
               </h2>
               <button type="button" onClick={onClose} className="text-neutral-400 hover:text-white transition-colors">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,24 +281,24 @@ export const BrandModal: React.FC<BrandModalProps> = ({
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-2">Nombre de la Marca *</label>
+                <label className="block text-sm font-medium text-neutral-300 mb-2">Brand Name *</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Ej: Belora"
+                  placeholder="E.g: Belora"
                   maxLength={80}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-2">Descripción</label>
+                <label className="block text-sm font-medium text-neutral-300 mb-2">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                  placeholder="Descripción de la marca..."
+                  placeholder="Brand description..."
                   rows={3}
                   maxLength={500}
                 />
@@ -306,7 +306,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
             </div>
 
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-white mb-3">Colores</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Colors</h3>
               {colors.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {colors.map((color, index) => (
@@ -340,7 +340,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                           )}
                           {color.allowAsBackground && (
                             <span className="px-2 py-0.5 bg-green-900/50 text-green-300 rounded text-xs">
-                              Fondo permitido
+                              Background allowed
                             </span>
                           )}
                         </div>
@@ -373,10 +373,10 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                   value={newColor.role}
                   onChange={(e) => setNewColor(prev => ({ ...prev, role: e.target.value }))}
                   className="flex-1 min-w-[120px] px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm"
-                  placeholder="Role (ej: primary)"
+                  placeholder="Role (e.g: primary)"
                 />
                 <button type="button" onClick={addColor} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm font-medium transition-colors">
-                  + Agregar
+                  + Add
                 </button>
               </div>
             </div>
@@ -393,7 +393,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                       <div className="flex-1 text-sm">
                         <div className="text-white">
                           {logo.isExisting ? (
-                            <span>Logo existente ({logo.type})</span>
+                            <span>Existing logo ({logo.type})</span>
                           ) : (
                             logo.file?.name
                           )}
@@ -401,7 +401,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                         <div className="text-neutral-400">
                           {logo.type}
                           {logo.file && ` • ${(logo.file.size / 1024).toFixed(1)} KB`}
-                          {logo.invertOnDark && ' • Invierte en oscuro'}
+                          {logo.invertOnDark && ' • Inverts on dark'}
                         </div>
                       </div>
                       {logos.length > 1 ? (
@@ -409,7 +409,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                           type="button" 
                           onClick={() => removeLogo(index)} 
                           className="text-red-400 hover:text-red-300 transition-colors"
-                          title="Eliminar logo"
+                          title="Delete logo"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -418,7 +418,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                       ) : (
                         <div 
                           className="text-neutral-600 cursor-not-allowed" 
-                          title="Debe haber al menos un logo"
+                          title="Must have at least one logo"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -445,19 +445,19 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  {mode === 'edit' ? 'Agregar nuevo logo' : 'Subir archivo (SVG o PNG)'}
+                  {mode === 'edit' ? 'Add new logo' : 'Upload file (SVG or PNG)'}
                   <input type="file" accept="image/svg+xml,image/png" onChange={handleLogoFileChange} className="hidden" />
                 </label>
               </div>
               <p className="text-xs text-neutral-500 mt-1">
                 {mode === 'edit' 
-                  ? '⚠️ Para cambiar logos: elimina todos los existentes y sube los nuevos. Los cambios reemplazan todos los logos.' 
-                  : 'Máximo 5MB por archivo. Debe haber al menos un logo.'}
+                  ? '⚠️ To change logos: delete all existing ones and upload new ones. Changes replace all logos.' 
+                  : 'Maximum 5MB per file. Must have at least one logo.'}
               </p>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-white mb-3">Taglines Permitidos</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Allowed Taglines</h3>
               {taglines.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {taglines.map((tagline, index) => (
@@ -479,11 +479,11 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                   onChange={(e) => setNewTagline(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTagline())}
                   className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm"
-                  placeholder="Ej: Vida slow junto al río"
+                  placeholder="E.g: Slow life by the river"
                   maxLength={120}
                 />
                 <button type="button" onClick={addTagline} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm font-medium transition-colors">
-                  + Agregar
+                  + Add
                 </button>
               </div>
             </div>
@@ -495,7 +495,7 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                 className="px-6 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors"
                 disabled={loading}
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 type="submit"
@@ -508,9 +508,9 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Guardando...
+                    Saving...
                   </span>
-                ) : mode === 'create' ? 'Crear Marca' : 'Guardar Cambios'}
+                ) : mode === 'create' ? 'Create Brand' : 'Save Changes'}
               </button>
             </div>
           </form>
