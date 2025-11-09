@@ -152,7 +152,7 @@ byId:
       '404':
         description: Brand not found
   put:
-    summary: Replace BrandKit (colors, logos, taglines) for a brand
+    summary: Update BrandKit (colors, logos, taglines) for a brand
     operationId: updateBrand
     tags:
       - brands
@@ -168,16 +168,18 @@ byId:
         multipart/form-data:
           schema:
             type: object
-            required:
-              - logos
             properties:
               colors:
                 type: string
                 description: JSON array of color objects
                 example: '[{"hex":"#1A5E63","role":"primary","allowAsBackground":true}]'
+              logoUrls:
+                type: string
+                description: JSON array of existing logo URLs (to keep)
+                example: '["https://storage.googleapis.com/bucket/brands/{id}/existing.svg"]'
               logos:
                 type: string
-                description: JSON array of logo metadata objects (new files required)
+                description: JSON array of new logo metadata objects (new files required)
                 example: '[{"type":"primary","invertOnDark":true}]'
               taglinesAllowed:
                 type: string
@@ -210,6 +212,8 @@ byId:
           encoding:
             colors:
               contentType: application/json
+            logoUrls:
+              contentType: application/json
             logos:
               contentType: application/json
             taglinesAllowed:
@@ -241,6 +245,39 @@ byId:
                 value:
                   code: "UNPROCESSABLE_ENTITY"
                   message: "Expected 2 logo files, but received 1"
+              unknownLogoUrl:
+                summary: Unknown existing logo URL
+                value:
+                  code: "UNPROCESSABLE_ENTITY"
+                  message: "Logo URL not found in brand: https://.../unknown.svg"
+                  field: "logoUrls"
+              maxLogosExceeded:
+                summary: Maximum logos exceeded
+                value:
+                  code: "UNPROCESSABLE_ENTITY"
+                  message: "Maximum 6 logos allowed"
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/Common.yaml#/Error'
+  delete:
+    summary: Delete a brand
+    operationId: deleteBrand
+    tags:
+      - brands
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '204':
+        description: Brand deleted successfully
+      '404':
+        description: Brand not found
       '500':
         description: Server error
         content:

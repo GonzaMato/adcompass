@@ -38,6 +38,7 @@ export interface UpdateBrandDTO {
   logos?: LogoInput[];
   taglinesAllowed?: string[];
   logoFiles: LogoFile[];
+  existingLogoUrls?: string[];
 }
 
 /**
