@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./Button";
 
 interface BrandRulesModalProps {
@@ -8,6 +8,8 @@ interface BrandRulesModalProps {
   onClose: () => void;
   onSave: (rules: any) => Promise<void>;
   brandName: string;
+  initialRules?: any;
+  mode?: 'create' | 'edit';
 }
 
 // Estilos para el slider con el punto más visible
@@ -52,6 +54,8 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
   onClose,
   onSave,
   brandName,
+  initialRules,
+  mode = 'create',
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +95,66 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
   const [claimBannedPhrases, setClaimBannedPhrases] = useState<string[]>([]);
   const [claimPhraseInput, setClaimPhraseInput] = useState("");
 
-  if (!isOpen) return null;
+  const resetDefaults = () => {
+    setFormality(3);
+    setWarmth(3);
+    setEnergy(3);
+    setHumor(3);
+    setConfidence(3);
+    setBannedWords([]);
+    setBannedPhrases([]);
+    setTargetGrade(8);
+    setMaxExclamations(1);
+    setAllowEmojis(false);
+    setClaimBannedPhrases([]);
+    setMinWidthPx(100);
+    setMinHeightPx(100);
+    setMinClearSpaceX(0.1);
+    setAspectRatioLock(true);
+    setPlacementGrid(['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']);
+    setMinContrastRatio(4.5);
+    setInvertThresholdLuminance(0.35);
+    setMaxBackgroundComplexity(0.25);
+    setBlurOverlayRequired(true);
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (mode === 'edit' && initialRules) {
+      try {
+        setFormality(initialRules?.voice?.traits?.formality ?? 3);
+        setWarmth(initialRules?.voice?.traits?.warmth ?? 3);
+        setEnergy(initialRules?.voice?.traits?.energy ?? 3);
+        setHumor(initialRules?.voice?.traits?.humor ?? 3);
+        setConfidence(initialRules?.voice?.traits?.confidence ?? 3);
+
+        setBannedWords(initialRules?.voice?.lexicon?.bannedWords ?? []);
+        setBannedPhrases(initialRules?.voice?.lexicon?.bannedPhrases ?? []);
+
+        setTargetGrade(initialRules?.voice?.lexicon?.readability?.targetGrade ?? 8);
+        setMaxExclamations(initialRules?.voice?.lexicon?.readability?.maxExclamations ?? 1);
+        setAllowEmojis(initialRules?.voice?.lexicon?.readability?.allowEmojis ?? false);
+
+        setMinWidthPx(initialRules?.logoUsage?.minSizePx?.width ?? 100);
+        setMinHeightPx(initialRules?.logoUsage?.minSizePx?.height ?? 100);
+        setMinClearSpaceX(initialRules?.logoUsage?.minClearSpaceX ?? 0.1);
+        setAspectRatioLock(initialRules?.logoUsage?.aspectRatioLock ?? true);
+        setPlacementGrid(initialRules?.logoUsage?.placementGrid ?? ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']);
+
+        setMinContrastRatio(initialRules?.logoUsage?.background?.minContrastRatio ?? 4.5);
+        setInvertThresholdLuminance(initialRules?.logoUsage?.background?.invertThresholdLuminance ?? 0.35);
+        setMaxBackgroundComplexity(initialRules?.logoUsage?.background?.maxBackgroundComplexity ?? 0.25);
+        setBlurOverlayRequired(initialRules?.logoUsage?.background?.blurOverlayRequiredAboveComplexity ?? true);
+
+        setClaimBannedPhrases(initialRules?.claims?.bannedPhrases ?? []);
+      } catch {
+        // Fallback to defaults if mapping fails
+        resetDefaults();
+      }
+    } else {
+      resetDefaults();
+    }
+  }, [isOpen, mode, initialRules]);
 
   const handleAddBannedWord = () => {
     if (bannedWordInput.trim() && bannedWords.length < 5000) {
@@ -199,40 +262,25 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
       await onSave(rulesData);
       
-      // Reset form
-      setFormality(3);
-      setWarmth(3);
-      setEnergy(3);
-      setHumor(3);
-      setConfidence(3);
-      setBannedWords([]);
-      setBannedPhrases([]);
-      setTargetGrade(8);
-      setMaxExclamations(1);
-      setAllowEmojis(false);
-      setClaimBannedPhrases([]);
-      setMinWidthPx(100);
-      setMinHeightPx(100);
-      setMinClearSpaceX(0.1);
-      setAspectRatioLock(true);
-      setPlacementGrid(['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']);
-      setMinContrastRatio(4.5);
-      setInvertThresholdLuminance(0.35);
-      setMaxBackgroundComplexity(0.25);
-      setBlurOverlayRequired(true);
+      // Reset form after save (create) or keep state synced (edit)
+      if (mode === 'create') {
+        resetDefaults();
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear reglas');
+      setError(err instanceof Error ? err.message : 'Error al guardar reglas');
     } finally {
       setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <>
       <style>{sliderStyles}</style>
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div className="bg-neutral-900 rounded-lg p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-2xl font-bold text-white mb-2">Crear Reglas de Marca</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{mode === 'edit' ? 'Editar Reglas de Marca' : 'Crear Reglas de Marca'}</h2>
         <p className="text-neutral-400 mb-6">
           Define las reglas de uso para: {brandName}
         </p>
@@ -683,7 +731,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Guardando...' : 'Crear Reglas'}
+            {loading ? 'Guardando...' : (mode === 'edit' ? 'Guardar Cambios' : 'Crear Reglas')}
           </Button>
         </div>
       </div>

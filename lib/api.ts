@@ -92,3 +92,28 @@ export const brandsAPI = {
       method: 'DELETE',
     }),
 };
+
+// Brand Rules API endpoints
+export const brandRulesAPI = {
+  list: (brandId: string) => apiRequest<any[]>(`/brands/${brandId}/rules`),
+
+  get: (brandId: string, ruleId: string) =>
+    apiRequest<any>(`/brands/${brandId}/rules/${ruleId}`),
+
+  create: (brandId: string, rules: unknown) =>
+    apiRequest<any>(`/brands/${brandId}/rules`, {
+      method: 'POST',
+      body: JSON.stringify(rules),
+    }),
+
+  update: (brandId: string, ruleId: string, rules: unknown) =>
+    apiRequest<any>(`/brands/${brandId}/rules/${ruleId}`, {
+      method: 'PUT',
+      body: JSON.stringify(rules),
+    }),
+
+  delete: (brandId: string, ruleId: string) =>
+    apiRequest<void>(`/brands/${brandId}/rules/${ruleId}`, {
+      method: 'DELETE',
+    }),
+};

@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { BrandRulesModal } from "../components/BrandRulesModal";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { brandRulesAPI } from "@/lib/api";
 
 interface BrandRulesResponse {
   id: string;
@@ -83,7 +85,15 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Modal (create/edit)
+  const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [editingRule, setEditingRule] = useState<BrandRulesResponse | null>(null);
+
+  // Delete confirmation
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRules();
@@ -93,14 +103,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/brands/' + selectedBrand.id + '/rules');
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Error al obtener reglas' }));
-        throw new Error(error.message || 'Error ' + response.status);
-      }
-
-      const data = await response.json();
+      const data = await brandRulesAPI.list(selectedBrand.id);
       // La API siempre devuelve un array
       setAllRules(data);
       
@@ -120,24 +123,28 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
   const handleCreateRules = async (rulesData: any) => {
     try {
       setLoading(true);
-      const response = await fetch('/api/brands/' + selectedBrand.id + '/rules', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(rulesData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Error al crear reglas' }));
-        throw new Error(error.message || 'Error ' + response.status);
-      }
-
+      await brandRulesAPI.create(selectedBrand.id, rulesData);
       await fetchRules();
-      setShowCreateModal(false);
+      setIsRulesModalOpen(false);
     } catch (err) {
       console.error('Error creating rules:', err);
       alert(err instanceof Error ? err.message : 'Error al crear las reglas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateRules = async (rulesData: any) => {
+    if (!editingRule) return;
+    try {
+      setLoading(true);
+      await brandRulesAPI.update(selectedBrand.id, editingRule.id, rulesData);
+      await fetchRules();
+      setIsRulesModalOpen(false);
+      setEditingRule(null);
+    } catch (err) {
+      console.error('Error updating rules:', err);
+      alert(err instanceof Error ? err.message : 'Error al actualizar las reglas');
     } finally {
       setLoading(false);
     }
@@ -147,34 +154,9 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
     setExpandedRuleId(expandedRuleId === ruleId ? null : ruleId);
   };
 
-  const handleDeleteRule = async (ruleId: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta regla?')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch('/api/brands/' + selectedBrand.id + '/rules/' + ruleId, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Error al eliminar regla' }));
-        throw new Error(error.message || 'Error ' + response.status);
-      }
-
-      // Si la regla eliminada era la seleccionada, limpiar la selección
-      if (selectedRuleId === ruleId) {
-        setSelectedRuleId(null);
-      }
-
-      await fetchRules();
-    } catch (err) {
-      console.error('Error deleting rule:', err);
-      alert(err instanceof Error ? err.message : 'Error al eliminar la regla');
-    } finally {
-      setLoading(false);
-    }
+  const handleAskDeleteRule = (ruleId: string) => {
+    setDeletingRuleId(ruleId);
+    setConfirmOpen(true);
   };
 
   const handleContinue = () => {
@@ -219,7 +201,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Reglas de la Marca ({allRules.length})</h2>
-            <Button onClick={() => setShowCreateModal(true)}>
+            <Button onClick={() => { setModalMode('create'); setEditingRule(null); setIsRulesModalOpen(true); }}>
               Crear Nueva Regla
             </Button>
           </div>
@@ -277,7 +259,26 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteRule(rule.id);
+                        setModalMode('edit');
+                        setEditingRule(rule);
+                        setIsRulesModalOpen(true);
+                      }}
+                      className="text-blue-400 hover:text-blue-300 transition-colors p-2"
+                      title="Editar regla"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h.01M4 13V7a2 2 0 012-2h4m10 6v6a2 2 0 01-2 2h-6M7 21h.01M16.5 3.5a2.121 2.121 0 013 3L9 17l-4 1 1-4 10.5-10.5z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAskDeleteRule(rule.id);
                       }}
                       className="text-red-400 hover:text-red-300 transition-colors p-2"
                       title="Eliminar regla"
@@ -623,7 +624,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
               <p className="text-neutral-400">
                 Crea reglas para definir cómo debe usarse esta marca en anuncios
               </p>
-              <Button onClick={() => setShowCreateModal(true)}>
+              <Button onClick={() => { setModalMode('create'); setEditingRule(null); setIsRulesModalOpen(true); }}>
                 Crear Reglas
               </Button>
             </div>
@@ -632,10 +633,45 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
       )}
 
       <BrandRulesModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSave={handleCreateRules}
+        isOpen={isRulesModalOpen}
+        onClose={() => { setIsRulesModalOpen(false); setEditingRule(null); }}
+        onSave={modalMode === 'edit' ? handleUpdateRules : handleCreateRules}
         brandName={selectedBrand.name}
+        initialRules={editingRule?.rules}
+        mode={modalMode}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Eliminar regla"
+        message={`¿Eliminar la regla ${deletingRuleId ? '#' + deletingRuleId.slice(0, 8) : ''}? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        loading={loading && !!deletingRuleId}
+        onCancel={() => {
+          if (loading && deletingRuleId) return;
+          setConfirmOpen(false);
+          setDeletingRuleId(null);
+        }}
+        onConfirm={async () => {
+          const ruleId = deletingRuleId;
+          if (!ruleId) return;
+          try {
+            setLoading(true);
+            await brandRulesAPI.delete(selectedBrand.id, ruleId);
+            if (selectedRuleId === ruleId) {
+              setSelectedRuleId(null);
+            }
+            await fetchRules();
+            setConfirmOpen(false);
+            setDeletingRuleId(null);
+          } catch (err) {
+            console.error('Error deleting rule:', err);
+            alert(err instanceof Error ? err.message : 'Error al eliminar la regla');
+          } finally {
+            setLoading(false);
+          }
+        }}
       />
     </div>
   );
