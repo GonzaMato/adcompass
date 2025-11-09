@@ -3,9 +3,8 @@
 ## Secciones sugeridas de UI
 
 - Voz (voice)
-  - Sliders de rango 1–5 para: formality, warmth, energy, humor, confidence.
-  - Chips para allowedWords / bannedWords y CTA whitelist.
-  - Textarea para bannedPatterns (regex) con previsualización de matches.
+  - Sliders de rango 1–10 para: formality, warmth, energy, humor, confidence.
+  - Chips para allowedWords / bannedWords, bannedPhrases (frases a evitar) y CTA whitelist.
   - Readability: select (targetGrade), input numérico (maxExclamations), toggle (allowEmojis).
   - Overrides por canal: selector de canal + mismo formulario pero parcial.
 
@@ -29,7 +28,7 @@
 
 - Reutilizar esquema mediante tipos para el front:
   - Importar `BrandRulesInput` desde `@/types` (re-export del backend).
-  - Validar en el cliente con los mismos límites (1..5, 0..1, etc.).
+  - Validar en el cliente con los mismos límites (1..10, 0..1, etc.).
 
 ## Persistencia
 

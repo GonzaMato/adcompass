@@ -46,7 +46,6 @@ const sliderStyles = `
 
 const PLACEMENT_GRID_OPTIONS = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'] as const;
 
-type RangeTuple = [number, number];
 
 export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
   isOpen,
@@ -57,7 +56,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Voice - Traits (1-5 según schema)
+  // Voice - Traits (1-10 según schema)
   const [formality, setFormality] = useState<number>(3);
   const [warmth, setWarmth] = useState<number>(3);
   const [energy, setEnergy] = useState<number>(3);
@@ -67,8 +66,8 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
   // Voice - Lexicon
   const [bannedWords, setBannedWords] = useState<string[]>([]);
   const [bannedWordInput, setBannedWordInput] = useState("");
-  const [bannedPatterns, setBannedPatterns] = useState<string[]>([]);
-  const [bannedPatternInput, setBannedPatternInput] = useState("");
+  const [bannedPhrases, setBannedPhrases] = useState<string[]>([]);
+  const [bannedPhraseInput, setBannedPhraseInput] = useState("");
   
   // Voice - Readability
   const [targetGrade, setTargetGrade] = useState<number>(8);
@@ -89,8 +88,8 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
   const [blurOverlayRequired, setBlurOverlayRequired] = useState(true);
 
   // Claims
-  const [claimBannedPatterns, setClaimBannedPatterns] = useState<string[]>([]);
-  const [claimPatternInput, setClaimPatternInput] = useState("");
+  const [claimBannedPhrases, setClaimBannedPhrases] = useState<string[]>([]);
+  const [claimPhraseInput, setClaimPhraseInput] = useState("");
 
   if (!isOpen) return null;
 
@@ -105,26 +104,26 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
     setBannedWords(bannedWords.filter((_, i) => i !== index));
   };
 
-  const handleAddBannedPattern = () => {
-    if (bannedPatternInput.trim() && bannedPatterns.length < 1000) {
-      setBannedPatterns([...bannedPatterns, bannedPatternInput.trim()]);
-      setBannedPatternInput("");
+  const handleAddBannedPhrase = () => {
+    if (bannedPhraseInput.trim() && bannedPhrases.length < 1000) {
+      setBannedPhrases([...bannedPhrases, bannedPhraseInput.trim()]);
+      setBannedPhraseInput("");
     }
   };
 
-  const handleRemoveBannedPattern = (index: number) => {
-    setBannedPatterns(bannedPatterns.filter((_, i) => i !== index));
+  const handleRemoveBannedPhrase = (index: number) => {
+    setBannedPhrases(bannedPhrases.filter((_, i) => i !== index));
   };
 
-  const handleAddClaimPattern = () => {
-    if (claimPatternInput.trim() && claimBannedPatterns.length < 5000) {
-      setClaimBannedPatterns([...claimBannedPatterns, claimPatternInput.trim()]);
-      setClaimPatternInput("");
+  const handleAddClaimPhrase = () => {
+    if (claimPhraseInput.trim() && claimBannedPhrases.length < 5000) {
+      setClaimBannedPhrases([...claimBannedPhrases, claimPhraseInput.trim()]);
+      setClaimPhraseInput("");
     }
   };
 
-  const handleRemoveClaimPattern = (index: number) => {
-    setClaimBannedPatterns(claimBannedPatterns.filter((_, i) => i !== index));
+  const handleRemoveClaimPhrase = (index: number) => {
+    setClaimBannedPhrases(claimBannedPhrases.filter((_, i) => i !== index));
   };
 
   const togglePlacement = (placement: string) => {
@@ -138,19 +137,19 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
       setLoading(true);
       setError(null);
 
-      const rulesData = {
+              const rulesData = {
         voice: {
           traits: {
-            formality: [formality, formality] as RangeTuple,
-            warmth: [warmth, warmth] as RangeTuple,
-            energy: [energy, energy] as RangeTuple,
-            humor: [humor, humor] as RangeTuple,
-            confidence: [confidence, confidence] as RangeTuple,
+            formality: formality,
+            warmth: warmth,
+            energy: energy,
+            humor: humor,
+            confidence: confidence,
           },
           lexicon: {
             allowedWords: [],
             bannedWords,
-            bannedPatterns,
+            bannedPhrases,
             ctaWhitelist: [],
             readability: {
               targetGrade,
@@ -176,7 +175,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
           },
         },
         claims: {
-          bannedPatterns: claimBannedPatterns,
+          bannedPhrases: claimBannedPhrases,
           requiredSubstantiation: [],
           disclaimers: [],
         },
@@ -207,11 +206,11 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
       setHumor(3);
       setConfidence(3);
       setBannedWords([]);
-      setBannedPatterns([]);
+      setBannedPhrases([]);
       setTargetGrade(8);
       setMaxExclamations(1);
       setAllowEmojis(false);
-      setClaimBannedPatterns([]);
+      setClaimBannedPhrases([]);
       setMinWidthPx(100);
       setMinHeightPx(100);
       setMinClearSpaceX(0.1);
@@ -262,14 +261,14 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                 <input
                   type="range"
                   min="1"
-                  max="5"
+                  max="10"
                   value={formality}
                   onChange={(e) => setFormality(parseInt(e.target.value))}
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
                   <span>1 (Informal)</span>
-                  <span>5 (Formal)</span>
+                  <span>10 (Formal)</span>
                 </div>
               </div>
 
@@ -285,14 +284,14 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                 <input
                   type="range"
                   min="1"
-                  max="5"
+                  max="10"
                   value={warmth}
                   onChange={(e) => setWarmth(parseInt(e.target.value))}
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
                   <span>1 (Frío)</span>
-                  <span>5 (Cálido)</span>
+                  <span>10 (Cálido)</span>
                 </div>
               </div>
 
@@ -308,14 +307,14 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                 <input
                   type="range"
                   min="1"
-                  max="5"
+                  max="10"
                   value={energy}
                   onChange={(e) => setEnergy(parseInt(e.target.value))}
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
                   <span>1 (Calmado)</span>
-                  <span>5 (Enérgico)</span>
+                  <span>10 (Enérgico)</span>
                 </div>
               </div>
 
@@ -331,14 +330,14 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                 <input
                   type="range"
                   min="1"
-                  max="5"
+                  max="10"
                   value={humor}
                   onChange={(e) => setHumor(parseInt(e.target.value))}
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
                   <span>1 (Serio)</span>
-                  <span>5 (Humorístico)</span>
+                  <span>10 (Humorístico)</span>
                 </div>
               </div>
 
@@ -354,14 +353,14 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                 <input
                   type="range"
                   min="1"
-                  max="5"
+                  max="10"
                   value={confidence}
                   onChange={(e) => setConfidence(parseInt(e.target.value))}
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
                   <span>1 (Cauteloso)</span>
-                  <span>5 (Confiado)</span>
+                  <span>10 (Confiado)</span>
                 </div>
               </div>
             </div>
@@ -447,26 +446,26 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Patrones Prohibidos (Regex)
+                Frases Prohibidas
               </label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
-                  value={bannedPatternInput}
-                  onChange={(e) => setBannedPatternInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBannedPattern())}
-                  placeholder="Ej: '^100%', 'garantizado'"
+                  value={bannedPhraseInput}
+                  onChange={(e) => setBannedPhraseInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBannedPhrase())}
+                  placeholder="Ej: 'el mejor', 'garantizado', '100%'"
                   className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
                 />
-                <Button onClick={handleAddBannedPattern} disabled={!bannedPatternInput.trim()}>
+                <Button onClick={handleAddBannedPhrase} disabled={!bannedPhraseInput.trim()}>
                   Agregar
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {bannedPatterns.map((pattern, idx) => (
-                  <span key={idx} className="inline-flex items-center gap-1 px-3 py-1 bg-orange-500/20 text-orange-300 rounded text-sm font-mono">
-                    {pattern}
-                    <button onClick={() => handleRemoveBannedPattern(idx)} className="hover:text-orange-100">×</button>
+                {bannedPhrases.map((phrase, idx) => (
+                  <span key={idx} className="inline-flex items-center gap-1 px-3 py-1 bg-orange-500/20 text-orange-300 rounded text-sm">
+                    {phrase}
+                    <button onClick={() => handleRemoveBannedPhrase(idx)} className="hover:text-orange-100">×</button>
                   </span>
                 ))}
               </div>
@@ -652,26 +651,26 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
             
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Patrones de Claims Prohibidos (Regex)
+                Frases de Claims Prohibidas
               </label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
-                  value={claimPatternInput}
-                  onChange={(e) => setClaimPatternInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddClaimPattern())}
+                  value={claimPhraseInput}
+                  onChange={(e) => setClaimPhraseInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddClaimPhrase())}
                   placeholder="Ej: 'el mejor', 'garantizado 100%'"
                   className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
                 />
-                <Button onClick={handleAddClaimPattern} disabled={!claimPatternInput.trim()}>
+                <Button onClick={handleAddClaimPhrase} disabled={!claimPhraseInput.trim()}>
                   Agregar
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {claimBannedPatterns.map((pattern, idx) => (
+                {claimBannedPhrases.map((phrase, idx) => (
                   <span key={idx} className="inline-flex items-center gap-1 px-3 py-1 bg-red-500/20 text-red-300 rounded text-sm">
-                    {pattern}
-                    <button onClick={() => handleRemoveClaimPattern(idx)} className="hover:text-red-100">×</button>
+                    {phrase}
+                    <button onClick={() => handleRemoveClaimPhrase(idx)} className="hover:text-red-100">×</button>
                   </span>
                 ))}
               </div>

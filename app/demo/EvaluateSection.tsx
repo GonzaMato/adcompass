@@ -13,16 +13,17 @@ interface BrandRulesResponse {
   rules: {
     voice: {
       traits: {
-        formality: [number, number];
-        warmth: [number, number];
-        energy: [number, number];
-        humor: [number, number];
-        confidence: [number, number];
+        formality: number | [number, number];
+        warmth: number | [number, number];
+        energy: number | [number, number];
+        humor: number | [number, number];
+        confidence: number | [number, number];
       };
       lexicon: {
         allowedWords: string[];
         bannedWords: string[];
-        bannedPatterns: string[];
+        bannedPhrases?: string[];
+        bannedPatterns?: string[];
         ctaWhitelist: string[];
         readability: {
           targetGrade: number;
@@ -47,7 +48,8 @@ interface BrandRulesResponse {
       };
     };
     claims: {
-      bannedPatterns: string[];
+      bannedPhrases?: string[];
+      bannedPatterns?: string[];
       requiredSubstantiation: any[];
       disclaimers: any[];
     };
@@ -248,9 +250,9 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {rule.rules.claims.bannedPatterns.length > 0 && (
+                        {(rule.rules.claims.bannedPhrases?.length ?? rule.rules.claims.bannedPatterns?.length ?? 0) > 0 && (
                           <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded">
-                            {rule.rules.claims.bannedPatterns.length} claims prohibidos
+                            {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length} claims prohibidos
                           </span>
                         )}
                         {rule.rules.voice.lexicon.bannedWords.length > 0 && (
@@ -331,9 +333,13 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                               <div className="text-lg mb-1">{trait.icon}</div>
                               <div className="text-xs text-neutral-400 mb-1">{trait.label}</div>
                               <div className="text-lg font-bold text-white">
-                                {trait.value[0]}{trait.value[0] !== trait.value[1] ? `-${trait.value[1]}` : ''}
+                                {(() => {
+                                  const v = trait.value as number | [number, number];
+                                  const normalized = typeof v === 'number' ? v : Math.round(((v[0] + v[1]) / 2) * 2);
+                                  return normalized;
+                                })()}
                               </div>
-                              <div className="text-xs text-neutral-500 mt-1">de 5</div>
+                              <div className="text-xs text-neutral-500 mt-1">de 10</div>
                             </div>
                           ))}
                         </div>
@@ -359,7 +365,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                       </div>
 
                       {/* Voice Lexicon */}
-                      {(rule.rules.voice.lexicon.bannedWords.length > 0 || rule.rules.voice.lexicon.bannedPatterns.length > 0) && (
+                      {(rule.rules.voice.lexicon.bannedWords.length > 0 || (rule.rules.voice.lexicon.bannedPhrases?.length ?? rule.rules.voice.lexicon.bannedPatterns?.length ?? 0) > 0) && (
                         <div className="bg-red-500/5 rounded-lg p-4 border border-red-500/20">
                           <div className="flex items-center gap-2 mb-4">
                             <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,18 +391,18 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                 </div>
                               </div>
                             )}
-                            {rule.rules.voice.lexicon.bannedPatterns.length > 0 && (
+                            {(rule.rules.voice.lexicon.bannedPhrases?.length ?? rule.rules.voice.lexicon.bannedPatterns?.length ?? 0) > 0 && (
                               <div>
-                                <p className="text-xs text-neutral-400 mb-2 font-medium">🔍 Patrones Prohibidos ({rule.rules.voice.lexicon.bannedPatterns.length})</p>
+                                <p className="text-xs text-neutral-400 mb-2 font-medium">🔍 Frases Prohibidas ({(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length})</p>
                                 <div className="flex flex-wrap gap-2">
-                                  {rule.rules.voice.lexicon.bannedPatterns.slice(0, 8).map((pattern, idx) => (
-                                    <span key={idx} className="px-2.5 py-1 bg-orange-500/20 text-orange-300 rounded-md text-xs font-mono border border-orange-500/30">
-                                      {pattern}
+                                  {(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).slice(0, 8).map((phrase, idx) => (
+                                    <span key={idx} className="px-2.5 py-1 bg-orange-500/20 text-orange-300 rounded-md text-xs font-medium border border-orange-500/30">
+                                      {phrase}
                                     </span>
                                   ))}
-                                  {rule.rules.voice.lexicon.bannedPatterns.length > 8 && (
+                                  {(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length > 8 && (
                                     <span className="px-2.5 py-1 bg-neutral-700 text-neutral-400 rounded-md text-xs">
-                                      +{rule.rules.voice.lexicon.bannedPatterns.length - 8} más
+                                      +{(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length - 8} más
                                     </span>
                                   )}
                                 </div>
@@ -501,7 +507,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                       </div>
 
                       {/* Claims */}
-                      {rule.rules.claims.bannedPatterns.length > 0 && (
+                      {(rule.rules.claims.bannedPhrases?.length ?? rule.rules.claims.bannedPatterns?.length ?? 0) > 0 && (
                         <div className="bg-yellow-500/5 rounded-lg p-4 border border-yellow-500/20">
                           <div className="flex items-center gap-2 mb-3">
                             <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -510,14 +516,14 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                             <h4 className="text-sm font-semibold text-white">Claims Prohibidos</h4>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {rule.rules.claims.bannedPatterns.slice(0, 12).map((pattern, idx) => (
+                            {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).slice(0, 12).map((phrase, idx) => (
                               <span key={idx} className="px-2.5 py-1 bg-yellow-500/20 text-yellow-300 rounded-md text-xs font-medium border border-yellow-500/30">
-                                {pattern}
+                                {phrase}
                               </span>
                             ))}
-                            {rule.rules.claims.bannedPatterns.length > 12 && (
+                            {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length > 12 && (
                               <span className="px-2.5 py-1 bg-neutral-700 text-neutral-400 rounded-md text-xs">
-                                +{rule.rules.claims.bannedPatterns.length - 12} más
+                                +{(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length - 12} más
                               </span>
                             )}
                           </div>

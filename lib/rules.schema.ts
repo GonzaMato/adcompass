@@ -4,7 +4,7 @@ import { ValidationError } from './errors';
 
 /**
  * Brand Rules V2
- * - Voice defined by quantitative traits (ranges 1..5) and lexicon
+ * - Voice defined by quantitative traits (integers 1..10) and lexicon
  * - Visual constraints for logo/background based on measurable thresholds
  * - Compliance rules (claims, disclaimers, substantiation) by region/channel
  * - Accessibility (WCAG), Platform rules, and Governance metadata
@@ -15,22 +15,36 @@ const Range1to5Schema = z
   .tuple([z.number().int().min(1).max(5), z.number().int().min(1).max(5)])
   .refine(([min, max]) => min <= max, { message: 'min must be <= max' });
 
+// New trait schema: integer 1..10 with backward-compat accepting [min,max] (1..5 each)
+const Trait1to10 = z.number().int().min(1).max(10);
+const TraitCompatSchema = z
+  .union([Trait1to10, Range1to5Schema])
+  .transform((value) => {
+    if (typeof value === 'number') {
+      return value;
+    }
+    const [min, max] = value;
+    const avg = (min + max) / 2; // 1..5
+    const mapped = Math.round(avg * 2); // map to 1..10
+    return Math.min(10, Math.max(1, mapped));
+  });
+
 const PlacementGridEnum = z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']);
 
 const SeverityEnum = z.enum(['hard_fail', 'soft_warn']);
 
-const EvaluatorEnum = z.enum(['contrast', 'regex', 'complexity', 'readability', 'size', 'governance']);
+const EvaluatorEnum = z.enum(['contrast', 'keyword', 'complexity', 'readability', 'size', 'governance']);
 
 const ChannelId = z.string().min(1);
 const RegionId = z.string().min(2).max(3); // e.g., AR, US, EU
 
 // Voice
 const VoiceTraitsSchema = z.object({
-  formality: Range1to5Schema,
-  warmth: Range1to5Schema,
-  energy: Range1to5Schema,
-  humor: Range1to5Schema,
-  confidence: Range1to5Schema,
+  formality: TraitCompatSchema,
+  warmth: TraitCompatSchema,
+  energy: TraitCompatSchema,
+  humor: TraitCompatSchema,
+  confidence: TraitCompatSchema,
 });
 
 const VoiceReadabilitySchema = z.object({
@@ -42,7 +56,7 @@ const VoiceReadabilitySchema = z.object({
 const VoiceLexiconSchema = z.object({
   allowedWords: z.array(z.string()).max(5000).default([]),
   bannedWords: z.array(z.string()).max(5000).default([]),
-  bannedPatterns: z.array(z.string()).max(1000).default([]), // regex patterns (as strings)
+  bannedPhrases: z.array(z.string()).max(1000).default([]),
   ctaWhitelist: z.array(z.string()).max(1000).default([]),
   readability: VoiceReadabilitySchema.default({} as any),
 });
@@ -99,7 +113,7 @@ const DisclaimerSchema = z.object({
 });
 
 const ClaimsSchema = z.object({
-  bannedPatterns: z.array(z.string()).max(5000).default([]),
+  bannedPhrases: z.array(z.string()).max(5000).default([]),
   requiredSubstantiation: z.array(RequiredSubstantiationSchema).default([]),
   disclaimers: z.array(DisclaimerSchema).max(200).default([]),
 });

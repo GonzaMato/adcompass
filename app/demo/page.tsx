@@ -6,6 +6,7 @@ import { BrandModal } from "../components/BrandModal";
 import { brandsAPI } from "@/lib/api";
 import { SelectBrandSection } from "./SelectBrandSection";
 import { SelectBrandRulesSection } from "./EvaluateSection";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export default function DemoPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -17,6 +18,9 @@ export default function DemoPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
 
   useEffect(() => {
     fetchBrands();
@@ -59,6 +63,12 @@ export default function DemoPage() {
     setIsModalOpen(true);
   };
 
+  const handleDeleteBrand = (brand: Brand, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBrandToDelete(brand);
+    setConfirmOpen(true);
+  };
+
   const handleSaveBrand = async (formData: FormData) => {
     try {
       if (modalMode === 'create') {
@@ -94,7 +104,9 @@ export default function DemoPage() {
             onContinue={handleContinue}
             onCreateBrand={handleCreateBrand}
             onEditBrand={handleEditBrand}
+            onDeleteBrand={handleDeleteBrand}
             onRetry={fetchBrands}
+            deletingId={deletingId}
           />
         )}
       </div>
@@ -105,6 +117,39 @@ export default function DemoPage() {
         onSave={handleSaveBrand}
         brand={editingBrand}
         mode={modalMode}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Eliminar marca"
+        message={`¿Eliminar la marca "${brandToDelete?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        loading={!!deletingId}
+        onCancel={() => {
+          if (deletingId) return;
+          setConfirmOpen(false);
+          setBrandToDelete(null);
+        }}
+        onConfirm={async () => {
+          if (!brandToDelete) return;
+          try {
+            setDeletingId(brandToDelete.id);
+            setError(null);
+            await brandsAPI.delete(brandToDelete.id);
+            await fetchBrands();
+            if (selectedBrand?.id === brandToDelete.id) {
+              setSelectedBrand(null);
+            }
+            setConfirmOpen(false);
+            setBrandToDelete(null);
+          } catch (err) {
+            console.error('Error deleting brands:', err);
+            setError(err instanceof Error ? err.message : 'Error al eliminar la marca');
+          } finally {
+            setDeletingId(null);
+          }
+        }}
       />
     </div>
   );

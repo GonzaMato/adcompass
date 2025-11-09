@@ -15,7 +15,9 @@ interface SelectBrandSectionProps {
   onContinue: () => void;
   onCreateBrand: () => void;
   onEditBrand: (brand: Brand, e: React.MouseEvent) => void;
+  onDeleteBrand: (brand: Brand, e: React.MouseEvent) => void;
   onRetry: () => void;
+  deletingId?: string;
 }
 
 export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
@@ -27,7 +29,9 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
   onContinue,
   onCreateBrand,
   onEditBrand,
+  onDeleteBrand,
   onRetry,
+  deletingId,
 }) => {
   const getPrimaryLogo = (brand: Brand) => {
     return brand.logos?.find(logo => logo.type === 'primary')?.url;
@@ -133,6 +137,20 @@ export const SelectBrandSection: React.FC<SelectBrandSectionProps> = ({
                         >
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={(e) => onDeleteBrand(brand, e)}
+                          disabled={deletingId === brand.id}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-lg ${
+                            deletingId === brand.id
+                              ? 'bg-red-800 opacity-60 cursor-not-allowed'
+                              : 'bg-red-600 hover:bg-red-700'
+                          }`}
+                          title="Eliminar marca"
+                        >
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-8 0h10" />
                           </svg>
                         </button>
                       </div>
