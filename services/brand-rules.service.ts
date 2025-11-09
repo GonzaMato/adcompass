@@ -10,14 +10,9 @@ export class BrandRulesService {
       const data = parseRulesBody(rawBody, contentType);
       const rules = validateRules(data);
 
-      const existing = await this.repo.findByBrandId(brandId);
-      if (existing) {
-        throw new ConflictError('Rules already exist for this brand');
-      }
-
       return await this.repo.create(brandId, rules);
     } catch (error) {
-      if (error instanceof ValidationError || error instanceof ConflictError) {
+      if (error instanceof ValidationError) {
         throw error;
       }
       if (error instanceof DatabaseError) {
@@ -27,25 +22,29 @@ export class BrandRulesService {
     }
   }
 
-  async getRules(brandId: string): Promise<BrandRulesRecord> {
-    const found = await this.repo.findByBrandId(brandId);
-    if (!found) {
-      throw new NotFoundError('Brand rules not found');
+  async listByBrand(brandId: string): Promise<BrandRulesRecord[]> {
+    return await this.repo.findByBrandId(brandId);
+  }
+
+  async getById(brandId: string, ruleId: string): Promise<BrandRulesRecord> {
+    const found = await this.repo.findById(ruleId);
+    if (!found || found.brandId !== brandId) {
+      throw new NotFoundError('Brand rule not found');
     }
     return found;
   }
 
-  async updateRules(brandId: string, rawBody: string, contentType: string | null | undefined): Promise<BrandRulesRecord> {
+  async updateById(brandId: string, ruleId: string, rawBody: string, contentType: string | null | undefined): Promise<BrandRulesRecord> {
     try {
       const data = parseRulesBody(rawBody, contentType);
       const rules: BrandRulesInput = validateRules(data);
 
-      const existing = await this.repo.findByBrandId(brandId);
-      if (!existing) {
-        throw new NotFoundError('Brand rules not found');
+      const existing = await this.repo.findById(ruleId);
+      if (!existing || existing.brandId !== brandId) {
+        throw new NotFoundError('Brand rule not found');
       }
 
-      return await this.repo.updateByBrandId(brandId, rules);
+      return await this.repo.updateById(ruleId, rules);
     } catch (error) {
       if (error instanceof ValidationError || error instanceof NotFoundError) {
         throw error;
@@ -53,12 +52,20 @@ export class BrandRulesService {
       if (error instanceof DatabaseError) {
         throw error;
       }
-      throw new DatabaseError(`Failed to update rules: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new DatabaseError(`Failed to update rule: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   async listAll(): Promise<BrandRulesRecord[]> {
     return this.repo.findAll();
+  }
+
+  async deleteById(brandId: string, ruleId: string): Promise<void> {
+    const existing = await this.repo.findById(ruleId);
+    if (!existing || existing.brandId !== brandId) {
+      throw new NotFoundError('Brand rule not found');
+    }
+    await this.repo.deleteById(ruleId);
   }
 }
 

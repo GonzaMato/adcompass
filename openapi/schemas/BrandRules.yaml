@@ -1,68 +1,168 @@
 BrandRulesInput:
   type: object
-  required:
-    - prohibitedClaims
-    - tone
-    - logoUsage
-    - sensitive
+  required: [voice, logoUsage]
   properties:
-    prohibitedClaims:
-      type: array
-      maxItems: 5000
-      items:
-        type: string
-    tone:
+    voice:
       type: object
-      required: [allowed, bannedWords]
+      required: [traits]
       properties:
-        allowed:
-          type: array
-          items:
-            type: string
-            enum: [formal, friendly, playful, authoritative]
-        bannedWords:
-          type: array
-          maxItems: 5000
-          items:
-            type: string
+        traits:
+          type: object
+          required: [formality, warmth, energy, humor, confidence]
+          properties:
+            formality: { $ref: '#/Range1to5' }
+            warmth: { $ref: '#/Range1to5' }
+            energy: { $ref: '#/Range1to5' }
+            humor: { $ref: '#/Range1to5' }
+            confidence: { $ref: '#/Range1to5' }
+        lexicon:
+          type: object
+          properties:
+            allowedWords: { type: array, items: { type: string }, maxItems: 5000 }
+            bannedWords: { type: array, items: { type: string }, maxItems: 5000 }
+            bannedPatterns: { type: array, items: { type: string }, maxItems: 1000 }
+            ctaWhitelist: { type: array, items: { type: string }, maxItems: 1000 }
+            readability:
+              type: object
+              properties:
+                targetGrade: { type: integer, minimum: 1, maximum: 14, default: 8 }
+                maxExclamations: { type: integer, minimum: 0, maximum: 5, default: 1 }
+                allowEmojis: { type: boolean, default: false }
+        perChannelOverrides:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              traits: { $ref: '#/VoiceTraitsPartial' }
+              lexicon:
+                type: object
+                properties:
+                  allowedWords: { type: array, items: { type: string } }
+                  bannedWords: { type: array, items: { type: string } }
+                  bannedPatterns: { type: array, items: { type: string } }
+                  ctaWhitelist: { type: array, items: { type: string } }
     logoUsage:
       type: object
-      required: [allowedPositions, bannedBackgrounds, invertOnDark, minClearSpaceRatio]
       properties:
-        allowedPositions:
+        minSizePx:
+          type: object
+          properties:
+            width: { type: integer, minimum: 0, default: 0 }
+            height: { type: integer, minimum: 0, default: 0 }
+        minClearSpaceX: { type: number, minimum: 0, maximum: 5, default: 0 }
+        aspectRatioLock: { type: boolean, default: true }
+        placementGrid:
           type: array
           items:
             type: string
             enum: [top-left, top-right, bottom-left, bottom-right, center]
-        bannedBackgrounds:
+        background:
+          type: object
+          properties:
+            minContrastRatio: { type: number, minimum: 1, maximum: 21, default: 4.5 }
+            invertThresholdLuminance: { type: number, minimum: 0, maximum: 1, default: 0.35 }
+            maxBackgroundComplexity: { type: number, minimum: 0, maximum: 1, default: 0.25 }
+            blurOverlayRequiredAboveComplexity: { type: boolean, default: true }
+    claims:
+      type: object
+      properties:
+        bannedPatterns: { type: array, items: { type: string }, maxItems: 5000 }
+        requiredSubstantiation:
           type: array
           items:
-            type: string
-            enum: [patterned, image, video, gradient, low-contrast]
-        invertOnDark:
-          type: boolean
-        minClearSpaceRatio:
-          type: number
-          minimum: 0
-          maximum: 1
+            type: object
+            required: [type]
+            properties:
+              type:
+                type: string
+                enum: [clinical_study, survey, internal_data, third_party]
+              appliesToPatterns:
+                type: array
+                items: { type: string }
+        disclaimers:
+          type: array
+          maxItems: 200
+          items:
+            type: object
+            required: [template]
+            properties:
+              template: { type: string }
+              regions: { type: array, items: { type: string } }
+              channels: { type: array, items: { type: string } }
     sensitive:
       type: object
-      required: [disallowCategories]
       properties:
-        disallowCategories:
+        policies:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              allowed: { type: string, enum: [allowed, conditional, disallowed], default: conditional }
+              minAudienceAge: { type: integer, minimum: 0, maximum: 120 }
+              regions: { type: array, items: { type: string } }
+              channels: { type: array, items: { type: string } }
+              requiresLegalReview: { type: boolean, default: false }
+    accessibility:
+      type: object
+      properties:
+        wcag:
+          type: object
+          properties:
+            minContrastRatio: { type: number, minimum: 1, maximum: 21, default: 4.5 }
+            minFontSizePx: { type: integer, minimum: 8, maximum: 72, default: 14 }
+            captionsRequired: { type: boolean, default: true }
+            altTextRequired: { type: boolean, default: true }
+    platformRules:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            maxTextOnImagePct: { type: number, minimum: 0, maximum: 100, default: 20 }
+            maxHashtags: { type: integer, minimum: 0, maximum: 50, default: 5 }
+        google:
+          type: object
+          properties:
+            headlineCharLimit: { type: integer, minimum: 10, maximum: 90, default: 30 }
+        youtube:
+          type: object
+          properties:
+            maxDurationSec: { type: integer, minimum: 1, maximum: 600, default: 30 }
+            captionsRequired: { type: boolean, default: true }
+    governance:
+      type: object
+      properties:
+        severityDefault: { type: string, enum: [hard_fail, soft_warn], default: hard_fail }
+        checks:
           type: array
           items:
-            type: string
-            enum: [politics, religion, health, alcohol, gambling, adult, financial]
-        minAudienceAge:
-          type: integer
-          minimum: 0
-          maximum: 120
-    requiredDisclaimers:
-      type: array
-      maxItems: 200
-      items:
-        type: string
+            type: object
+            required: [id, description, evaluator]
+            properties:
+              id: { type: string }
+              description: { type: string }
+              severity: { type: string, enum: [hard_fail, soft_warn], default: hard_fail }
+              evaluator: { type: string, enum: [contrast, regex, complexity, readability, size, governance] }
+              remediationHint: { type: string }
+
+Range1to5:
+  type: array
+  minItems: 2
+  maxItems: 2
+  items:
+    type: integer
+    minimum: 1
+    maximum: 5
+  example: [2, 4]
+
+VoiceTraitsPartial:
+  type: object
+  properties:
+    formality: { $ref: '#/Range1to5' }
+    warmth: { $ref: '#/Range1to5' }
+    energy: { $ref: '#/Range1to5' }
+    humor: { $ref: '#/Range1to5' }
+    confidence: { $ref: '#/Range1to5' }
 
 BrandRules:
   type: object

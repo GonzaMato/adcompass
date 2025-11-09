@@ -119,18 +119,22 @@ export class BrandController {
     try {
       const formData = await request.formData();
 
+      const nameField = formData.get('name') as string | null;
+      const descriptionField = formData.get('description') as string | null;
       const colorsJson = formData.get('colors') as string | null;
       const logosJson = formData.get('logos') as string | null;
       const taglinesJson = formData.get('taglinesAllowed') as string | null;
+      const logoUrlsJson = formData.get('logoUrls') as string | null;
 
-      let colors, logos, taglinesAllowed;
+      let colors, logos, taglinesAllowed, existingLogoUrls;
       try {
         colors = colorsJson ? JSON.parse(colorsJson) : undefined;
         logos = logosJson ? JSON.parse(logosJson) : undefined;
         taglinesAllowed = taglinesJson ? JSON.parse(taglinesJson) : undefined;
+        existingLogoUrls = logoUrlsJson ? JSON.parse(logoUrlsJson) : undefined;
       } catch (_err) {
         return NextResponse.json(
-          { code: 'BAD_REQUEST', message: 'Invalid JSON format in colors, logos or taglinesAllowed' },
+          { code: 'BAD_REQUEST', message: 'Invalid JSON format in colors, logos, taglinesAllowed or logoUrls' },
           { status: 400 }
         );
       }
@@ -139,27 +143,27 @@ export class BrandController {
       if (logos && Array.isArray(logos)) {
         for (let i = 0; i < logos.length; i++) {
           const file = formData.get(`logoFile${i}`) as File | null;
-          if (!file) {
-            // Deja que el service haga la validación exacta de mismatch como 422
-            // Aquí no forzamos BAD_REQUEST
-            break;
+          if (file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            logoFiles.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              buffer,
+            });
           }
-          const arrayBuffer = await file.arrayBuffer();
-          const buffer = Buffer.from(arrayBuffer);
-          logoFiles.push({
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            buffer,
-          });
         }
       }
 
       const brand = await this.service.updateBrand(id, {
+        name: nameField || undefined,
+        description: descriptionField || undefined,
         colors,
         logos,
         taglinesAllowed,
         logoFiles,
+        existingLogoUrls,
       });
 
       if (!brand) {
@@ -183,6 +187,41 @@ export class BrandController {
           { status: 422 }
         );
       }
+
+      if (error instanceof NotFoundError) {
+        return NextResponse.json(
+          { code: 'NOT_FOUND', message: error.message },
+          { status: 404 }
+        );
+      }
+
+      if (error instanceof StorageError) {
+        return NextResponse.json(
+          { code: error.code, message: error.message },
+          { status: 500 }
+        );
+      }
+
+      if (error instanceof DatabaseError) {
+        return NextResponse.json(
+          { code: error.code, message: error.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(
+        { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' },
+        { status: 500 }
+      );
+    }
+  }
+
+  async deleteBrand(id: string): Promise<NextResponse> {
+    try {
+      await this.service.deleteBrand(id);
+      return new NextResponse(null, { status: 204 });
+    } catch (error) {
+      console.error('Error in deleteBrand controller:', error);
 
       if (error instanceof NotFoundError) {
         return NextResponse.json(

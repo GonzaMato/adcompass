@@ -2,58 +2,68 @@ import { describe, it, expect } from '@jest/globals';
 import { parseRulesBody, validateRules } from '../../lib/rules.schema';
 import { ValidationError } from '../../lib/errors';
 
-const minimalValid = {
-  prohibitedClaims: [],
-  tone: { allowed: [], bannedWords: [] },
-  logoUsage: { allowedPositions: [], bannedBackgrounds: [], invertOnDark: false, minClearSpaceRatio: 0 },
-  sensitive: { disallowCategories: [] },
-  requiredDisclaimers: [],
+const minimalValidV2 = {
+  voice: {
+    traits: {
+      formality: [2, 4],
+      warmth: [3, 5],
+      energy: [2, 4],
+      humor: [1, 2],
+      confidence: [3, 5],
+    },
+  },
+  logoUsage: {
+    minSizePx: { width: 0, height: 0 },
+  },
 };
 
-describe('rules.schema', () => {
+describe('rules.schema V2', () => {
   it('parseRulesBody parses JSON by default', () => {
     const obj = parseRulesBody(JSON.stringify({ a: 1 }), 'application/json') as any;
     expect(obj.a).toBe(1);
   });
 
   it('parseRulesBody parses YAML when content-type contains yaml', () => {
-    const yaml = `tone:\n  allowed: [formal]\n  bannedWords: []\nlogoUsage:\n  allowedPositions: []\n  bannedBackgrounds: []\n  invertOnDark: false\n  minClearSpaceRatio: 0\nsensitive:\n  disallowCategories: []\nprohibitedClaims: []\nrequiredDisclaimers: []\n`;
+    const yaml = `voice:\n  traits:\n    formality: [2,4]\n    warmth: [3,5]\n    energy: [2,4]\n    humor: [1,2]\n    confidence: [3,5]\nlogoUsage:\n  minSizePx: { width: 0, height: 0 }\n`;
     const obj = parseRulesBody(yaml, 'application/x-yaml') as any;
-    expect(obj.tone.allowed[0]).toBe('formal');
+    expect(obj.voice.traits.formality[0]).toBe(2);
   });
 
-  it('validateRules succeeds on minimal valid input', () => {
-    const out = validateRules(minimalValid);
-    expect(out.logoUsage.minClearSpaceRatio).toBe(0);
+  it('validateRules succeeds on minimal valid V2 input', () => {
+    const out = validateRules(minimalValidV2);
+    expect(out.logoUsage.minClearSpaceX).toBe(0);
+    expect(out.logoUsage.background.minContrastRatio).toBeGreaterThanOrEqual(1);
   });
 
-  it('validateRules rejects too many prohibitedClaims', () => {
+  it('validateRules rejects invalid trait ranges', () => {
     const bad = {
-      ...minimalValid,
-      prohibitedClaims: Array.from({ length: 5001 }, (_, i) => `term-${i}`),
+      ...minimalValidV2,
+      voice: {
+        ...minimalValidV2.voice,
+        traits: {
+          ...minimalValidV2.voice.traits,
+          humor: [0, 6], // out of 1..5
+        },
+      },
     };
     expect(() => validateRules(bad)).toThrow(ValidationError);
   });
 
-  it('validateRules rejects invalid tone value', () => {
-    const bad = {
-      ...minimalValid,
-      tone: { allowed: ['wtf'], bannedWords: [] },
-    } as any;
-    expect(() => validateRules(bad)).toThrow(ValidationError);
-  });
-
-  it('validateRules enforces minClearSpaceRatio bounds', () => {
-    const badLow = { ...minimalValid, logoUsage: { ...minimalValid.logoUsage, minClearSpaceRatio: -0.1 } };
-    const badHigh = { ...minimalValid, logoUsage: { ...minimalValid.logoUsage, minClearSpaceRatio: 1.1 } };
+  it('validateRules enforces background contrast bounds', () => {
+    const badLow = { ...minimalValidV2, logoUsage: { ...minimalValidV2.logoUsage, background: { minContrastRatio: 0.5 } } };
+    const badHigh = { ...minimalValidV2, logoUsage: { ...minimalValidV2.logoUsage, background: { minContrastRatio: 22 } } };
     expect(() => validateRules(badLow)).toThrow(ValidationError);
     expect(() => validateRules(badHigh)).toThrow(ValidationError);
   });
 
   it('validateRules rejects >200 disclaimers', () => {
-    const bad = { ...minimalValid, requiredDisclaimers: Array.from({ length: 201 }, (_, i) => `d${i}`) };
+    const bad = {
+      ...minimalValidV2,
+      claims: {
+        disclaimers: Array.from({ length: 201 }, (_, i) => ({ template: `d${i}` })),
+      },
+    };
     expect(() => validateRules(bad)).toThrow(ValidationError);
   });
 });
-
 
