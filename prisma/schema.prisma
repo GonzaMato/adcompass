@@ -85,7 +85,13 @@ model Evaluation {
   id        String   @id @default(uuid()) @db.Uuid
   brandId   String   @db.Uuid
   ruleId    String   @db.Uuid
-  imageUrl  String   @db.VarChar(500)
+  // New fields for generic asset support
+  assetUrl  String   @db.VarChar(500)
+  assetType String   @db.VarChar(10) // 'IMAGE' | 'VIDEO'
+  context   String?  @db.Text
+
+  // Legacy imageUrl kept optional for compatibility
+  imageUrl  String?  @db.VarChar(500)
   result    Json
   createdAt DateTime @default(now()) @map("created_at")
 

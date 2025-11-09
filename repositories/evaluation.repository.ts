@@ -7,7 +7,10 @@ export interface EvaluationRecord {
   id: string;
   brandId: string;
   ruleId: string;
-  imageUrl: string;
+  assetUrl: string;
+  assetType: 'IMAGE' | 'VIDEO';
+  context?: string | null;
+  imageUrl?: string | null;
   result: unknown;
   createdAt: Date;
 }
@@ -21,7 +24,13 @@ export class EvaluationRepository {
         data: {
           brandId: input.brandId,
           ruleId: input.ruleId,
-          imageUrl: input.imageUrl,
+          assetUrl: input.assetUrl || input.imageUrl!,
+          assetType: input.assetType || 'IMAGE',
+          context: input.context ?? null,
+          // Keep legacy imageUrl populated for image assets
+          imageUrl: (input.assetType === 'IMAGE' || (!!input.imageUrl && !input.assetType))
+            ? (input.assetUrl || input.imageUrl!)
+            : null,
           result: result as any,
         },
       });

@@ -12,16 +12,23 @@ export class EvaluationService {
   constructor(private repo: EvaluationRepository = evaluationRepository) {}
 
   async evaluate(input: EvaluateRequestDTO): Promise<unknown> {
+    // Normalize legacy fields
+    const normalizedAssetUrl = input.assetUrl || input.imageUrl;
+    const normalizedAssetType = input.assetType || (input.imageUrl ? 'IMAGE' : undefined);
+
     // Validate input
-    const { brandId, ruleId, imageUrl } = input || ({} as any);
+    const { brandId, ruleId, context } = input || ({} as any);
     if (!brandId || typeof brandId !== 'string') {
       throw new ValidationError('Missing or invalid brandId', 'brandId');
     }
     if (!ruleId || typeof ruleId !== 'string') {
       throw new ValidationError('Missing or invalid ruleId', 'ruleId');
     }
-    if (!imageUrl || typeof imageUrl !== 'string') {
-      throw new ValidationError('Missing or invalid imageUrl', 'imageUrl');
+    if (!normalizedAssetUrl || typeof normalizedAssetUrl !== 'string') {
+      throw new ValidationError('Missing or invalid assetUrl', 'assetUrl');
+    }
+    if (!normalizedAssetType || (normalizedAssetType !== 'IMAGE' && normalizedAssetType !== 'VIDEO')) {
+      throw new ValidationError('Missing or invalid assetType', 'assetType');
     }
 
     const n8nUrl = process.env.N8N_EVALUATE_URL;
@@ -46,7 +53,12 @@ export class EvaluationService {
         body: JSON.stringify({
           brandId,
           ruleId,
-          image: imageUrl,
+          // New fields
+          assetUrl: normalizedAssetUrl,
+          assetType: normalizedAssetType,
+          context,
+          // Legacy field for backward compatibility
+          image: normalizedAssetUrl,
         }),
         signal: controller.signal,
       });
