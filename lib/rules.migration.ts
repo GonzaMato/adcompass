@@ -53,12 +53,24 @@ export function migrateRulesV1toV2(v1: V1): BrandRulesInput {
     }
   }
 
+  const toTraitNumber = (range: [number, number]): number => {
+    const avg = (range[0] + range[1]) / 2;
+    const mapped = Math.round(avg * 2); // map 1..5 → 1..10
+    return Math.min(10, Math.max(1, mapped));
+  };
+
   const voice = {
-    traits,
+    traits: {
+      formality: toTraitNumber(traits.formality),
+      warmth: toTraitNumber(traits.warmth),
+      energy: toTraitNumber(traits.energy),
+      humor: toTraitNumber(traits.humor),
+      confidence: toTraitNumber(traits.confidence),
+    },
     lexicon: {
       allowedWords: [] as string[],
       bannedWords: v1.tone?.bannedWords ?? [],
-      bannedPatterns: v1.prohibitedClaims ?? [],
+      bannedPhrases: [] as string[],
       ctaWhitelist: [] as string[],
       readability: {
         targetGrade: 8,
@@ -85,7 +97,7 @@ export function migrateRulesV1toV2(v1: V1): BrandRulesInput {
   };
 
   const claims = {
-    bannedPatterns: v1.prohibitedClaims ?? [],
+    bannedPhrases: v1.prohibitedClaims ?? [],
     requiredSubstantiation: [] as Array<{ type: 'clinical_study' | 'survey' | 'internal_data' | 'third_party'; appliesToPatterns: string[] }>,
     disclaimers: (v1.requiredDisclaimers ?? []).map((template) => ({ template, regions: [], channels: [] })),
   };
@@ -116,7 +128,7 @@ export function migrateRulesV1toV2(v1: V1): BrandRulesInput {
 
   const governance = {
     severityDefault: 'hard_fail' as const,
-    checks: [] as Array<{ id: string; description: string; severity?: 'hard_fail' | 'soft_warn'; evaluator: any; remediationHint?: string }>,
+    checks: [] as any[],
   };
 
   return {

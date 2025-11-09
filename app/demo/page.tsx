@@ -106,7 +106,7 @@ export default function DemoPage() {
             onEditBrand={handleEditBrand}
             onDeleteBrand={handleDeleteBrand}
             onRetry={fetchBrands}
-            deletingId={deletingId}
+            deletingId={deletingId || undefined}
           />
         )}
       </div>

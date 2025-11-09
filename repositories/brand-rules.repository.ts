@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { DatabaseError } from '../lib/errors';
 import { BrandRulesInput } from '../lib/rules.schema';
@@ -37,10 +37,10 @@ export class BrandRulesRepository {
     }
   }
 
-  async create(brandId: string, rules: unknown): Promise<BrandRulesRecord> {
+  async create(brandId: string, rules: BrandRulesInput): Promise<BrandRulesRecord> {
     try {
       return await this.db.brandRules.create({
-        data: { brandId, rules },
+        data: { brandId, rules: rules as unknown as Prisma.InputJsonValue },
       }) as unknown as BrandRulesRecord;
     } catch (error) {
       console.error('Database error in create brand rules:', error);
@@ -59,11 +59,11 @@ export class BrandRulesRepository {
     }
   }
 
-  async updateById(ruleId: string, rules: unknown): Promise<BrandRulesRecord> {
+  async updateById(ruleId: string, rules: BrandRulesInput): Promise<BrandRulesRecord> {
     try {
       return await this.db.brandRules.update({
         where: { id: ruleId },
-        data: { rules },
+        data: { rules: rules as unknown as Prisma.InputJsonValue },
       }) as unknown as BrandRulesRecord;
     } catch (error) {
       console.error('Database error in update brand rules:', error);

@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fixService } from '../../../../../services/fix.service';
 import { DatabaseError, NotFoundError, ValidationError } from '../../../../../lib/errors';
 
-export async function POST(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id: evaluationId } = await context.params;
+export async function POST(
+  _request: NextRequest,
+  context: { params: { id: string } | Promise<{ id: string }> }
+) {
+  const { id: evaluationId } = await Promise.resolve(context.params);
   try {
     const created = await fixService.fix(evaluationId);
     return NextResponse.json(created, { status: 200 });

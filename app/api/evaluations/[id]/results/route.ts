@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { evaluationResultRepository } from '../../../../../repositories/evaluationResult.repository';
 import { DatabaseError, ValidationError } from '../../../../../lib/errors';
 
-export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id: evaluationId } = await context.params;
+export async function GET(
+  _request: NextRequest,
+  context: { params: { id: string } | Promise<{ id: string }> }
+) {
+  const { id: evaluationId } = await Promise.resolve(context.params);
   try {
     if (!evaluationId || typeof evaluationId !== 'string') {
       throw new ValidationError('Missing or invalid evaluationId', 'id');

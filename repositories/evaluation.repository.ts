@@ -42,6 +42,35 @@ export class EvaluationRepository {
       );
     }
   }
+
+  async findById(id: string): Promise<EvaluationRecord | null> {
+    try {
+      const found = await this.db.evaluation.findUnique({
+        where: { id },
+      });
+      return (found as unknown as EvaluationRecord) ?? null;
+    } catch (error) {
+      console.error('Database error finding evaluation by id:', error);
+      throw new DatabaseError(
+        `Failed to fetch evaluation: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  async findLatestByBrandAndRule(brandId: string, ruleId: string): Promise<EvaluationRecord | null> {
+    try {
+      const found = await this.db.evaluation.findFirst({
+        where: { brandId, ruleId },
+        orderBy: { createdAt: 'desc' },
+      });
+      return (found as unknown as EvaluationRecord) ?? null;
+    } catch (error) {
+      console.error('Database error finding latest evaluation by brand and rule:', error);
+      throw new DatabaseError(
+        `Failed to fetch evaluation: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
 }
 
 export const evaluationRepository = new EvaluationRepository();
