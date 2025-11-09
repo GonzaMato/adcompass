@@ -72,6 +72,21 @@ export default function ResultsScreenImage({
   const parseEvaluationData = (): EvaluationData => {
     if (!evaluationResult) return {};
     
+    // Si el resultado tiene una propiedad 'output' (respuesta de n8n)
+    if (evaluationResult.output) {
+      try {
+        // Si output es string, parsearlo
+        if (typeof evaluationResult.output === 'string') {
+          return JSON.parse(evaluationResult.output);
+        }
+        // Si output ya es objeto, usarlo
+        return evaluationResult.output;
+      } catch (e) {
+        console.error('Error parsing output:', e);
+        return {};
+      }
+    }
+    
     if (typeof evaluationResult === 'string') {
       try {
         return JSON.parse(evaluationResult);
