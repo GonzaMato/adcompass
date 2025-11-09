@@ -75,12 +75,12 @@ export default function EvaluateClient({ brandId, ruleId }: Props) {
     const maxBytes = isVid ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
 
     if (!isVid && !isImg) {
-      setError("Tipo de archivo no soportado. Usa imagen o video.");
+      setError("Unsupported file type. Use image or video.");
       setFile(null);
       return;
     }
     if (nextFile.size > maxBytes) {
-      setError(isVid ? "El video supera el límite de 5 MB" : "La imagen supera el límite de 10 MB");
+      setError(isVid ? "Video exceeds 5 MB limit" : "Image exceeds 10 MB limit");
       setFile(null);
       return;
     }
@@ -115,7 +115,7 @@ export default function EvaluateClient({ brandId, ruleId }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      setError("Seleccioná un archivo para evaluar.");
+      setError("Select a file to evaluate.");
       return;
     }
     try {
@@ -381,7 +381,7 @@ export default function EvaluateClient({ brandId, ruleId }: Props) {
       setEvaluationResult(mockResult);
       setCurrentStep("results");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al enviar la evaluación");
+      setError(err instanceof Error ? err.message : "Error submitting evaluation");
       setCurrentStep("form");
     } finally {
       setSubmitting(false);
@@ -952,14 +952,14 @@ export default function EvaluateClient({ brandId, ruleId }: Props) {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Volver
+            Back
           </button>
         </div>
 
         <div className="text-center mb-10">
-          <h1 className="mt-1 text-3xl sm:text-4xl font-bold text-white">Evaluar Asset</h1>
+          <h1 className="mt-1 text-3xl sm:text-4xl font-bold text-white">Evaluate Asset</h1>
           <p className="mt-2 text-neutral-400">
-            Marca: {brandLoading ? "Cargando..." : (brandName ?? brandId)} — Regla: {ruleShort}
+            Brand: {brandLoading ? "Loading..." : (brandName ?? brandId)} — Rule: {ruleShort}
           </p>
           {/* Botones de desarrollo para cargar datos mock */}
           <div className="mt-4 flex justify-center gap-3">
@@ -970,7 +970,7 @@ export default function EvaluateClient({ brandId, ruleId }: Props) {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              Ver Demo Video
+              View Video Demo
             </button>
             <button
               onClick={handleLoadMockDataImage}
@@ -979,7 +979,7 @@ export default function EvaluateClient({ brandId, ruleId }: Props) {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Ver Demo Imagen
+              View Image Demo
             </button>
           </div>
         </div>

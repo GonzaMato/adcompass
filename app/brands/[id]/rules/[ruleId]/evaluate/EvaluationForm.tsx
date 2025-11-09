@@ -71,12 +71,12 @@ export default function EvaluationForm({
                   <svg className="w-10 h-10 mx-auto mb-2 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <div className="font-medium">Arrastrá tu archivo aquí</div>
-                  <div className="text-xs text-neutral-500 mt-1">o hacé click para seleccionar</div>
-                  <div className="text-xs text-neutral-500 mt-2">Video: máx 5 MB • Imagen: máx 10 MB</div>
+                  <div className="font-medium">Drag your file here</div>
+                  <div className="text-xs text-neutral-500 mt-1">or click to select</div>
+                  <div className="text-xs text-neutral-500 mt-2">Video: max 5 MB • Image: max 10 MB</div>
                   {file && (
                     <div className="mt-3 text-xs text-neutral-400 break-all">
-                      Seleccionado: {file.name}
+                      Selected: {file.name}
                     </div>
                   )}
                 </div>
@@ -94,7 +94,7 @@ export default function EvaluationForm({
             {previewUrl && (
               <div className="rounded-lg border border-neutral-800 p-4 bg-neutral-950/40">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-sm text-neutral-300">Previsualización</div>
+                  <div className="text-sm text-neutral-300">Preview</div>
                   <div className="text-xs text-neutral-500">
                     {file?.type?.split("/")[0].toUpperCase()} • {file?.name}
                   </div>
@@ -133,17 +133,17 @@ export default function EvaluationForm({
           <form onSubmit={onSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-neutral-300 mb-2">
-                Contexto de la evaluación
+                Evaluation Context
               </label>
               <textarea
                 value={context}
                 onChange={(e) => onContextChange(e.target.value)}
-                placeholder="Ej: Publicidad para TikTok en Halloween, audiencia 18-25, tono divertido."
+                placeholder="E.g.: TikTok Halloween advertisement, audience 18-25, playful tone."
                 className="w-full rounded-md bg-neutral-950/60 border border-neutral-800 text-neutral-200 placeholder-neutral-600 p-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 rows={8}
               />
               <p className="mt-2 text-xs text-neutral-500">
-                Opcional, ayuda a dar contexto al evaluador.
+                Optional, helps provide context to the evaluator.
               </p>
             </div>
 
@@ -164,14 +164,14 @@ export default function EvaluationForm({
                 disabled={!file || submitting}
                 className={!file || submitting ? "opacity-60 cursor-not-allowed" : ""}
               >
-                {submitting ? "Enviando..." : "Evaluar"}
+                {submitting ? "Submitting..." : "Evaluate"}
               </Button>
               <button
                 type="button"
                 onClick={onClear}
                 className="px-4 py-2 rounded-md text-sm bg-neutral-800 hover:bg-neutral-700 text-neutral-200 transition-colors"
               >
-                Limpiar
+                Clear
               </button>
             </div>
           </form>

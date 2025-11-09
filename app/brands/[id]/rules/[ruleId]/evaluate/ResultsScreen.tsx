@@ -156,9 +156,9 @@ export default function ResultsScreen({
 
   const getSeverityBadgeText = (severity: string) => {
     switch (severity) {
-      case "high": return "Alta Prioridad";
-      case "medium": return "Media Prioridad";
-      case "low": return "Baja Prioridad";
+      case "high": return "High Priority";
+      case "medium": return "Medium Priority";
+      case "low": return "Low Priority";
       default: return severity;
     }
   };
@@ -183,7 +183,7 @@ export default function ResultsScreen({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Nueva Evaluación
+            New Evaluation
           </button>
           <div className="flex items-center gap-3">
             <button
@@ -192,33 +192,33 @@ export default function ResultsScreen({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Exportar Reporte
+              Export Report
             </button>
             <button
               onClick={onBack}
               className="text-neutral-400 hover:text-white transition-colors text-sm"
             >
-              Volver al listado
+              Back to List
             </button>
           </div>
         </div>
 
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <Badge variant="success">Evaluación Completada</Badge>
+          <Badge variant="success">Evaluation Completed</Badge>
           <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-white mb-2">
-            Resultados de la Evaluación
+            Evaluation Results
           </h1>
           <p className="text-neutral-400 text-lg">
-            {brandName ?? brandId} — Regla: {ruleShort}
+            {brandName ?? brandId} — Rule: {ruleShort}
           </p>
           <div className="flex items-center justify-center gap-2 mt-3 text-sm text-neutral-500">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {data.timestamp 
-              ? `Evaluado el ${new Date(data.timestamp).toLocaleString('es-AR')}`
-              : `Evaluado el ${new Date().toLocaleString('es-AR')}`
+              ? `Evaluated on ${new Date(data.timestamp).toLocaleString('en-US')}`
+              : `Evaluated on ${new Date().toLocaleString('en-US')}`
             }
           </div>
           {data.evaluation_id && (
@@ -268,7 +268,7 @@ export default function ResultsScreen({
                       <div className={`text-5xl font-bold ${getScoreColor(overallScore)}`}>
                         {overallScore}
                       </div>
-                      <div className="text-sm text-neutral-400 mt-1">de 100</div>
+                      <div className="text-sm text-neutral-400 mt-1">out of 100</div>
                     </div>
                   </div>
                 </div>
@@ -277,19 +277,19 @@ export default function ResultsScreen({
                 <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
                     <div className="text-3xl font-bold text-red-400">{violationsBySeverity.high}</div>
-                    <div className="text-xs text-neutral-400 mt-1">Alta Prioridad</div>
+                    <div className="text-xs text-neutral-400 mt-1">High Priority</div>
                   </div>
                   <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 text-center">
                     <div className="text-3xl font-bold text-yellow-400">{violationsBySeverity.medium}</div>
-                    <div className="text-xs text-neutral-400 mt-1">Media Prioridad</div>
+                    <div className="text-xs text-neutral-400 mt-1">Medium Priority</div>
                   </div>
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 text-center">
                     <div className="text-3xl font-bold text-blue-400">{violationsBySeverity.low}</div>
-                    <div className="text-xs text-neutral-400 mt-1">Baja Prioridad</div>
+                    <div className="text-xs text-neutral-400 mt-1">Low Priority</div>
                   </div>
                   <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 text-center">
                     <div className="text-3xl font-bold text-purple-400">{totalViolations}</div>
-                    <div className="text-xs text-neutral-400 mt-1">Total Problemas</div>
+                    <div className="text-xs text-neutral-400 mt-1">Total Issues</div>
                   </div>
                 </div>
               </div>
@@ -299,31 +299,31 @@ export default function ResultsScreen({
                 {totalBlockers > 0 && (
                   <div className="bg-red-900/20 border border-red-800/30 rounded-lg p-3 text-center">
                     <div className="text-xl font-bold text-red-400">{totalBlockers}</div>
-                    <div className="text-xs text-neutral-400 mt-1">🚫 Críticos</div>
+                    <div className="text-xs text-neutral-400 mt-1">🚫 Critical</div>
                   </div>
                 )}
                 {totalWarnings > 0 && (
                   <div className="bg-yellow-900/20 border border-yellow-800/30 rounded-lg p-3 text-center">
                     <div className="text-xl font-bold text-yellow-400">{totalWarnings}</div>
-                    <div className="text-xs text-neutral-400 mt-1">⚡ Advertencias</div>
+                    <div className="text-xs text-neutral-400 mt-1">⚡ Warnings</div>
                   </div>
                 )}
                 {totalEvidence > 0 && (
                   <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-3 text-center">
                     <div className="text-xl font-bold text-blue-400">{totalEvidence}</div>
-                    <div className="text-xs text-neutral-400 mt-1">🔍 Evidencias</div>
+                    <div className="text-xs text-neutral-400 mt-1">🔍 Evidence</div>
                   </div>
                 )}
                 {totalRecommendations > 0 && (
                   <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-3 text-center">
                     <div className="text-xl font-bold text-green-400">{totalRecommendations}</div>
-                    <div className="text-xs text-neutral-400 mt-1">💡 Recomendaciones</div>
+                    <div className="text-xs text-neutral-400 mt-1">💡 Recommendations</div>
                   </div>
                 )}
                 {dimensionScores.length > 0 && (
                   <div className="bg-purple-900/20 border border-purple-800/30 rounded-lg p-3 text-center">
                     <div className="text-xl font-bold text-purple-400">{dimensionScores.length}</div>
-                    <div className="text-xs text-neutral-400 mt-1">📊 Dimensiones</div>
+                    <div className="text-xs text-neutral-400 mt-1">📊 Dimensions</div>
                   </div>
                 )}
               </div>
@@ -331,10 +331,10 @@ export default function ResultsScreen({
               {/* Progress message */}
               <div className="mt-6 text-center">
                 <p className="text-neutral-300">
-                  {overallScore >= 90 && "¡Excelente! Tu ad cumple casi a la perfección con las guías de marca."}
-                  {overallScore >= 75 && overallScore < 90 && "Muy bien! Tu ad está alineado con la marca, con pequeñas mejoras sugeridas."}
-                  {overallScore >= 60 && overallScore < 75 && "Buen trabajo, pero hay algunos aspectos importantes a mejorar."}
-                  {overallScore < 60 && "Tu ad necesita ajustes significativos para alinearse con la marca."}
+                  {overallScore >= 90 && "Excellent! Your ad almost perfectly meets the brand guidelines."}
+                  {overallScore >= 75 && overallScore < 90 && "Great! Your ad is aligned with the brand, with minor suggested improvements."}
+                  {overallScore >= 60 && overallScore < 75 && "Good work, but there are some important aspects to improve."}
+                  {overallScore < 60 && "Your ad needs significant adjustments to align with the brand."}
                 </p>
               </div>
 
@@ -342,14 +342,14 @@ export default function ResultsScreen({
               <div className="mt-4 text-center space-y-1">
                 {data.metadata?.total_processing_time_ms && (
                   <div className="text-xs text-neutral-500">
-                    ⚡ Procesado en {(data.metadata.total_processing_time_ms / 1000).toFixed(2)}s
+                    ⚡ Processed in {(data.metadata.total_processing_time_ms / 1000).toFixed(2)}s
                   </div>
                 )}
                 {data.metadata && (data.metadata.agents_processed || data.metadata.agents_failed !== undefined) && (
                   <div className="text-xs text-neutral-600">
-                    {data.metadata.agents_processed && `${data.metadata.agents_processed} agentes procesados`}
+                    {data.metadata.agents_processed && `${data.metadata.agents_processed} agents processed`}
                     {data.metadata.agents_failed !== undefined && data.metadata.agents_failed > 0 && 
-                      ` · ${data.metadata.agents_failed} fallos`}
+                      ` · ${data.metadata.agents_failed} failed`}
                   </div>
                 )}
               </div>
@@ -362,7 +362,7 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">📊</span>
-              Análisis por Dimensión
+              Analysis by Dimension
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {dimensionScores.map((dimension, index) => (
@@ -384,7 +384,7 @@ export default function ResultsScreen({
                       ></div>
                     </div>
                     <div className="mt-3 text-xs text-neutral-500">
-                      {violationsByDimension[dimension.key]?.length || 0} problemas detectados
+                      {violationsByDimension[dimension.key]?.length || 0} issues detected
                     </div>
                   </Card>
                 </BackgroundGradient>
@@ -398,7 +398,7 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">⚡</span>
-              Advertencias ({data.warnings.length})
+              Warnings ({data.warnings.length})
             </h2>
             <div className="space-y-4">
               {data.warnings.map((warning: any, index: number) => (
@@ -417,12 +417,12 @@ export default function ResultsScreen({
                               <div className="text-xs text-yellow-400 mb-1">{warning.dimension}</div>
                             )}
                             <h3 className="text-lg font-semibold text-white">
-                              {warning.type?.replace(/_/g, ' ').toUpperCase() || 'Advertencia'}
+                              {warning.type?.replace(/_/g, ' ').toUpperCase() || 'Warning'}
                             </h3>
                           </div>
                           {warning.confidence && (
                             <div className="text-xs text-neutral-500">
-                              {Math.round(warning.confidence * 100)}% confianza
+                              {Math.round(warning.confidence * 100)}% confidence
                             </div>
                           )}
                         </div>
@@ -446,7 +446,7 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">🚫</span>
-              Problemas Críticos ({totalBlockers})
+              Critical Issues ({totalBlockers})
             </h2>
             <div className="space-y-4">
               {data.blockers?.map((blocker, index) => (
@@ -462,11 +462,11 @@ export default function ResultsScreen({
                         <div className="flex items-start justify-between mb-2">
                           <div>
                             <div className="text-xs text-red-400 mb-1">{blocker.dimension || 'General'}</div>
-                            <h3 className="text-lg font-semibold text-white">{blocker.type?.replace(/_/g, ' ').toUpperCase() || 'Problema Crítico'}</h3>
+                            <h3 className="text-lg font-semibold text-white">{blocker.type?.replace(/_/g, ' ').toUpperCase() || 'Critical Issue'}</h3>
                           </div>
                           {blocker.confidence && (
                             <div className="text-xs text-neutral-500">
-                              {Math.round(blocker.confidence * 100)}% confianza
+                              {Math.round(blocker.confidence * 100)}% confidence
                             </div>
                           )}
                         </div>
@@ -490,7 +490,7 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">⚠️</span>
-              Problemas Detectados ({totalViolations})
+              Detected Issues ({totalViolations})
             </h2>
             
             {Object.entries(violationsByDimension).map(([dimension, violations]) => (
@@ -524,7 +524,7 @@ export default function ResultsScreen({
                               </div>
                               {violation.confidence && (
                                 <div className="text-xs text-neutral-500">
-                                  {Math.round(violation.confidence * 100)}% confianza
+                                  {Math.round(violation.confidence * 100)}% confidence
                                 </div>
                               )}
                             </div>
@@ -540,14 +540,14 @@ export default function ResultsScreen({
                                 </div>
                               )}
                               {violation.duration_seconds && (
-                                <div>Duración: {violation.duration_seconds}s</div>
+                                <div>Duration: {violation.duration_seconds}s</div>
                               )}
                               {violation.threshold && (
-                                <div>Umbral: {violation.threshold}</div>
+                                <div>Threshold: {violation.threshold}</div>
                               )}
                               {violation.detected_text && (
                                 <div className="bg-neutral-800 px-2 py-1 rounded">
-                                  Texto: "{Array.isArray(violation.detected_text) ? violation.detected_text.join(', ') : violation.detected_text}"
+                                  Text: "{Array.isArray(violation.detected_text) ? violation.detected_text.join(', ') : violation.detected_text}"
                                 </div>
                               )}
                             </div>
@@ -567,7 +567,7 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">🔍</span>
-              Evidencias ({data.evidence.length})
+              Evidence ({data.evidence.length})
             </h2>
             
             {/* Group evidence by dimension */}
@@ -609,7 +609,7 @@ export default function ResultsScreen({
                               </span>
                               {evidence.confidence && (
                                 <span className="bg-green-500/10 text-green-400 px-2 py-1 rounded">
-                                  ✓ {Math.round(evidence.confidence * 100)}% confianza
+                                  ✓ {Math.round(evidence.confidence * 100)}% confidence
                                 </span>
                               )}
                               {evidence.timestamp && (
@@ -644,12 +644,12 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">💡</span>
-              Recomendaciones ({data.recommendations.length})
+              Recommendations ({data.recommendations.length})
             </h2>
 
             {highPriorityRecs.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-red-400 mb-3">🔴 Alta Prioridad</h3>
+                <h3 className="text-lg font-semibold text-red-400 mb-3">🔴 High Priority</h3>
                 <div className="space-y-3">
                   {highPriorityRecs.map((rec, index) => (
                     <BackgroundGradient key={index}>
@@ -679,7 +679,7 @@ export default function ResultsScreen({
 
             {mediumPriorityRecs.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-yellow-400 mb-3">🟡 Media Prioridad</h3>
+                <h3 className="text-lg font-semibold text-yellow-400 mb-3">🟡 Medium Priority</h3>
                 <div className="space-y-3">
                   {mediumPriorityRecs.map((rec, index) => (
                     <BackgroundGradient key={index}>
@@ -709,7 +709,7 @@ export default function ResultsScreen({
 
             {otherRecs.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-neutral-400 mb-3">⚪ Otras Sugerencias</h3>
+                <h3 className="text-lg font-semibold text-neutral-400 mb-3">⚪ Other Suggestions</h3>
                 <div className="space-y-3">
                   {otherRecs.map((rec, index) => (
                     <BackgroundGradient key={index}>
@@ -744,7 +744,7 @@ export default function ResultsScreen({
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">📋</span>
-              Información de la Evaluación
+              Evaluation Information
             </h2>
             <BackgroundGradient>
               <Card className="bg-neutral-900 border-neutral-800 p-6">
@@ -757,7 +757,7 @@ export default function ResultsScreen({
                   )}
                   {data.metadata.brand_name && (
                     <div>
-                      <div className="text-xs text-neutral-500 mb-1">Marca</div>
+                      <div className="text-xs text-neutral-500 mb-1">Brand</div>
                       <div className="text-neutral-300 font-semibold">{data.metadata.brand_name}</div>
                     </div>
                   )}
@@ -769,7 +769,7 @@ export default function ResultsScreen({
                   )}
                   {data.metadata.total_processing_time_ms && (
                     <div>
-                      <div className="text-xs text-neutral-500 mb-1">Tiempo de Procesamiento</div>
+                      <div className="text-xs text-neutral-500 mb-1">Processing Time</div>
                       <div className="text-neutral-300">
                         {(data.metadata.total_processing_time_ms / 1000).toFixed(2)}s
                         <span className="text-neutral-500 text-xs ml-2">
@@ -780,13 +780,13 @@ export default function ResultsScreen({
                   )}
                   {data.metadata.agents_processed !== undefined && (
                     <div>
-                      <div className="text-xs text-neutral-500 mb-1">Agentes Procesados</div>
+                      <div className="text-xs text-neutral-500 mb-1">Agents Processed</div>
                       <div className="text-neutral-300">{data.metadata.agents_processed}</div>
                     </div>
                   )}
                   {data.metadata.agents_failed !== undefined && (
                     <div>
-                      <div className="text-xs text-neutral-500 mb-1">Agentes Fallidos</div>
+                      <div className="text-xs text-neutral-500 mb-1">Agents Failed</div>
                       <div className={data.metadata.agents_failed > 0 ? "text-red-400" : "text-green-400"}>
                         {data.metadata.agents_failed}
                       </div>
@@ -794,7 +794,7 @@ export default function ResultsScreen({
                   )}
                   {data.metadata.critical_violations !== undefined && (
                     <div>
-                      <div className="text-xs text-neutral-500 mb-1">Violaciones Críticas</div>
+                      <div className="text-xs text-neutral-500 mb-1">Critical Violations</div>
                       <div className={data.metadata.critical_violations > 0 ? "text-red-400 font-bold" : "text-green-400"}>
                         {data.metadata.critical_violations}
                       </div>
@@ -802,9 +802,9 @@ export default function ResultsScreen({
                   )}
                   {data.timestamp && (
                     <div>
-                      <div className="text-xs text-neutral-500 mb-1">Fecha/Hora</div>
+                      <div className="text-xs text-neutral-500 mb-1">Date/Time</div>
                       <div className="text-neutral-300 text-sm">
-                        {new Date(data.timestamp).toLocaleString('es-AR', {
+                        {new Date(data.timestamp).toLocaleString('en-US', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
@@ -827,7 +827,7 @@ export default function ResultsScreen({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
-            Ver JSON completo de la respuesta
+            View complete JSON response
           </summary>
           <BackgroundGradient>
             <Card className="bg-neutral-900 border-neutral-800 p-6">
@@ -847,7 +847,7 @@ export default function ResultsScreen({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            Evaluar Otro Asset
+            Evaluate Another Asset
           </button>
         </div>
       </div>
