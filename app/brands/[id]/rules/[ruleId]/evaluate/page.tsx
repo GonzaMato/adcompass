@@ -1,5 +1,5 @@
 import { use } from "react";
-import EvaluateClient from "@/app/brands/[id]/rules/[ruleId]/evaluate/EvaluateClient";
+                                             import EvaluateClient from "@/app/brands/[id]/rules/[ruleId]/evaluate/EvaluateClient";
 
 type PageProps = {
   params: Promise<{ id: string; ruleId: string }>;

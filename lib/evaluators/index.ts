@@ -28,9 +28,9 @@ export interface ComplexityInput {
   maxAllowed: number; // 0..1
 }
 
-export interface RegexInput {
+export interface KeywordInput {
   text: string;
-  bannedPatterns: string[];
+  bannedPhrases: string[];
 }
 
 export interface ReadabilityInput {
@@ -53,7 +53,7 @@ export const ComplexityEvaluator: Evaluator<ComplexityInput> = {
   evaluate: (_input) => ({ status: 'pass', issues: [] }),
 };
 
-export const RegexEvaluator: Evaluator<RegexInput> = {
+export const KeywordEvaluator: Evaluator<KeywordInput> = {
   evaluate: (_input) => ({ status: 'pass', issues: [] }),
 };
 

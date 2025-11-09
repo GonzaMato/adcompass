@@ -10,17 +10,17 @@ BrandRulesInput:
           type: object
           required: [formality, warmth, energy, humor, confidence]
           properties:
-            formality: { $ref: '#/Range1to5' }
-            warmth: { $ref: '#/Range1to5' }
-            energy: { $ref: '#/Range1to5' }
-            humor: { $ref: '#/Range1to5' }
-            confidence: { $ref: '#/Range1to5' }
+            formality: { $ref: '#/Trait1to10' }
+            warmth: { $ref: '#/Trait1to10' }
+            energy: { $ref: '#/Trait1to10' }
+            humor: { $ref: '#/Trait1to10' }
+            confidence: { $ref: '#/Trait1to10' }
         lexicon:
           type: object
           properties:
             allowedWords: { type: array, items: { type: string }, maxItems: 5000 }
             bannedWords: { type: array, items: { type: string }, maxItems: 5000 }
-            bannedPatterns: { type: array, items: { type: string }, maxItems: 1000 }
+            bannedPhrases: { type: array, items: { type: string }, maxItems: 1000 }
             ctaWhitelist: { type: array, items: { type: string }, maxItems: 1000 }
             readability:
               type: object
@@ -66,7 +66,7 @@ BrandRulesInput:
     claims:
       type: object
       properties:
-        bannedPatterns: { type: array, items: { type: string }, maxItems: 5000 }
+        bannedPhrases: { type: array, items: { type: string }, maxItems: 5000 }
         requiredSubstantiation:
           type: array
           items:
@@ -142,27 +142,23 @@ BrandRulesInput:
               id: { type: string }
               description: { type: string }
               severity: { type: string, enum: [hard_fail, soft_warn], default: hard_fail }
-              evaluator: { type: string, enum: [contrast, regex, complexity, readability, size, governance] }
+              evaluator: { type: string, enum: [contrast, keyword, complexity, readability, size, governance] }
               remediationHint: { type: string }
 
-Range1to5:
-  type: array
-  minItems: 2
-  maxItems: 2
-  items:
-    type: integer
-    minimum: 1
-    maximum: 5
-  example: [2, 4]
+Trait1to10:
+  type: integer
+  minimum: 1
+  maximum: 10
+  example: 7
 
 VoiceTraitsPartial:
   type: object
   properties:
-    formality: { $ref: '#/Range1to5' }
-    warmth: { $ref: '#/Range1to5' }
-    energy: { $ref: '#/Range1to5' }
-    humor: { $ref: '#/Range1to5' }
-    confidence: { $ref: '#/Range1to5' }
+    formality: { $ref: '#/Trait1to10' }
+    warmth: { $ref: '#/Trait1to10' }
+    energy: { $ref: '#/Trait1to10' }
+    humor: { $ref: '#/Trait1to10' }
+    confidence: { $ref: '#/Trait1to10' }
 
 BrandRules:
   type: object
