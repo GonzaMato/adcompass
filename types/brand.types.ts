@@ -28,11 +28,14 @@ export interface CreateBrandDTO {
 /**
  * DTO para actualizar completamente el BrandKit
  * Usado en PUT /api/brands/{id}
- * No permite cambiar name/description
+ * Permite actualizar name, description, colors, logos y taglines
+ * Logos son opcionales - si no se proporcionan, se mantienen los existentes
  */
 export interface UpdateBrandDTO {
+  name?: string;
+  description?: string;
   colors?: ColorInput[];
-  logos: LogoInput[];
+  logos?: LogoInput[];
   taglinesAllowed?: string[];
   logoFiles: LogoFile[];
 }

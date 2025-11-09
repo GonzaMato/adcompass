@@ -119,6 +119,8 @@ export class BrandController {
     try {
       const formData = await request.formData();
 
+      const nameField = formData.get('name') as string | null;
+      const descriptionField = formData.get('description') as string | null;
       const colorsJson = formData.get('colors') as string | null;
       const logosJson = formData.get('logos') as string | null;
       const taglinesJson = formData.get('taglinesAllowed') as string | null;
@@ -139,23 +141,22 @@ export class BrandController {
       if (logos && Array.isArray(logos)) {
         for (let i = 0; i < logos.length; i++) {
           const file = formData.get(`logoFile${i}`) as File | null;
-          if (!file) {
-            // Deja que el service haga la validación exacta de mismatch como 422
-            // Aquí no forzamos BAD_REQUEST
-            break;
+          if (file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            logoFiles.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              buffer,
+            });
           }
-          const arrayBuffer = await file.arrayBuffer();
-          const buffer = Buffer.from(arrayBuffer);
-          logoFiles.push({
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            buffer,
-          });
         }
       }
 
       const brand = await this.service.updateBrand(id, {
+        name: nameField || undefined,
+        description: descriptionField || undefined,
         colors,
         logos,
         taglinesAllowed,
