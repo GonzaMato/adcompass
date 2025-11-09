@@ -40,3 +40,8 @@ export type {
   ErrorResponse,
 } from './error.types';
 
+// Evaluation types
+export type {
+  EvaluateRequestDTO,
+} from './evaluation.types';
+

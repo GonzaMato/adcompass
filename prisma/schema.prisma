@@ -21,6 +21,7 @@ model Brand {
   logos     Logo[]
   taglines  Tagline[]
   brandRules BrandRules?
+  evaluations Evaluation[]
 
   @@map("brands")
 }
@@ -78,4 +79,18 @@ model BrandRules {
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@map("brand_rules")
+}
+
+model Evaluation {
+  id        String   @id @default(uuid()) @db.Uuid
+  brandId   String   @db.Uuid
+  ruleId    String   @db.Uuid
+  imageUrl  String   @db.VarChar(500)
+  result    Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("evaluations")
+  @@index([brandId], map: "idx_evaluations_brand_id")
 }
