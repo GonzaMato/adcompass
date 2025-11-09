@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BrandService, brandService } from '../services/brand.service';
-import { ValidationError, StorageError, DatabaseError } from '../lib/errors';
+import { ValidationError, StorageError, DatabaseError, NotFoundError } from '../lib/errors';
 import { CreateBrandDTO, LogoFile } from '../types';
 
 export class BrandController {
@@ -91,6 +91,103 @@ export class BrandController {
             field: error.field 
           },
           { status: 400 }
+        );
+      }
+
+      if (error instanceof StorageError) {
+        return NextResponse.json(
+          { code: error.code, message: error.message },
+          { status: 500 }
+        );
+      }
+
+      if (error instanceof DatabaseError) {
+        return NextResponse.json(
+          { code: error.code, message: error.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(
+        { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' },
+        { status: 500 }
+      );
+    }
+  }
+
+  async updateBrand(request: NextRequest, id: string): Promise<NextResponse> {
+    try {
+      const formData = await request.formData();
+
+      const colorsJson = formData.get('colors') as string | null;
+      const logosJson = formData.get('logos') as string | null;
+      const taglinesJson = formData.get('taglinesAllowed') as string | null;
+
+      let colors, logos, taglinesAllowed;
+      try {
+        colors = colorsJson ? JSON.parse(colorsJson) : undefined;
+        logos = logosJson ? JSON.parse(logosJson) : undefined;
+        taglinesAllowed = taglinesJson ? JSON.parse(taglinesJson) : undefined;
+      } catch (_err) {
+        return NextResponse.json(
+          { code: 'BAD_REQUEST', message: 'Invalid JSON format in colors, logos or taglinesAllowed' },
+          { status: 400 }
+        );
+      }
+
+      const logoFiles: LogoFile[] = [];
+      if (logos && Array.isArray(logos)) {
+        for (let i = 0; i < logos.length; i++) {
+          const file = formData.get(`logoFile${i}`) as File | null;
+          if (!file) {
+            // Deja que el service haga la validación exacta de mismatch como 422
+            // Aquí no forzamos BAD_REQUEST
+            break;
+          }
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          logoFiles.push({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            buffer,
+          });
+        }
+      }
+
+      const brand = await this.service.updateBrand(id, {
+        colors,
+        logos,
+        taglinesAllowed,
+        logoFiles,
+      });
+
+      if (!brand) {
+        return NextResponse.json(
+          { code: 'NOT_FOUND', message: 'Brand not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(brand, { status: 200 });
+    } catch (error) {
+      console.error('Error in updateBrand controller:', error);
+
+      if (error instanceof ValidationError) {
+        return NextResponse.json(
+          { 
+            code: 'UNPROCESSABLE_ENTITY',
+            message: error.message,
+            field: error.field 
+          },
+          { status: 422 }
+        );
+      }
+
+      if (error instanceof NotFoundError) {
+        return NextResponse.json(
+          { code: 'NOT_FOUND', message: error.message },
+          { status: 404 }
         );
       }
 

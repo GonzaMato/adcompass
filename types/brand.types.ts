@@ -26,6 +26,18 @@ export interface CreateBrandDTO {
 }
 
 /**
+ * DTO para actualizar completamente el BrandKit
+ * Usado en PUT /api/brands/{id}
+ * No permite cambiar name/description
+ */
+export interface UpdateBrandDTO {
+  colors?: ColorInput[];
+  logos: LogoInput[];
+  taglinesAllowed?: string[];
+  logoFiles: LogoFile[];
+}
+
+/**
  * Archivo de logo subido
  */
 export interface LogoFile {
@@ -71,6 +83,32 @@ export interface CreateBrandData {
     allowAsBackground?: boolean;
   }[];
   logos: {
+    type: string;
+    url: string;
+    mime: string;
+    sizeBytes?: number;
+    widthPx?: number;
+    heightPx?: number;
+    minClearSpaceRatio?: number;
+    allowedPositions?: any;
+    bannedBackgrounds?: any;
+    monochrome?: any;
+    invertOnDark?: boolean;
+  }[];
+  taglines?: string[];
+}
+
+/**
+ * Datos para actualizar un Brand en la base de datos (relaciones opcionales)
+ */
+export interface UpdateBrandData {
+  colors?: {
+    role?: string;
+    hex: string;
+    darkVariant?: string;
+    allowAsBackground?: boolean;
+  }[];
+  logos?: {
     type: string;
     url: string;
     mime: string;

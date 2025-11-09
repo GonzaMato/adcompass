@@ -5,6 +5,17 @@ import { BrandService } from '../../services/brand.service';
 import { ValidationError, StorageError, DatabaseError } from '../../lib/errors';
 
 // Mock the service
+let consoleErrorSpy: ReturnType<typeof jest.spyOn>;
+
+beforeAll(() => {
+  consoleErrorSpy = jest.spyOn(console, 'error');
+  consoleErrorSpy.mockImplementation(() => {});
+});
+
+afterAll(() => {
+  consoleErrorSpy.mockRestore();
+});
+
 jest.mock('../../services/brand.service');
 
 describe('BrandController', () => {
@@ -14,6 +25,7 @@ describe('BrandController', () => {
   beforeEach(() => {
     mockService = {
       createBrand: jest.fn(),
+      updateBrand: jest.fn(),
       getBrandById: jest.fn(),
       getAllBrands: jest.fn(),
     } as any;
@@ -28,7 +40,7 @@ describe('BrandController', () => {
       formData.append('logos', JSON.stringify([{ type: 'primary' }]));
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       const response = await brandController.createBrand(request);
@@ -47,7 +59,7 @@ describe('BrandController', () => {
       // Not including logoFile0
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       const response = await brandController.createBrand(request);
@@ -64,7 +76,7 @@ describe('BrandController', () => {
       formData.append('colors', JSON.stringify([{ hex: '#FF0000' }]));
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       const response = await brandController.createBrand(request);
@@ -86,7 +98,7 @@ describe('BrandController', () => {
       formData.append('logoFile0', file);
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       mockService.createBrand.mockRejectedValue(
@@ -111,7 +123,7 @@ describe('BrandController', () => {
       formData.append('logoFile0', file);
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       mockService.createBrand.mockRejectedValue(
@@ -135,7 +147,7 @@ describe('BrandController', () => {
       formData.append('logoFile0', file);
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       mockService.createBrand.mockRejectedValue(
@@ -161,7 +173,7 @@ describe('BrandController', () => {
       formData.append('logoFile0', file);
 
       const request = {
-        formData: jest.fn().mockResolvedValue(formData),
+        formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData),
       } as any as NextRequest;
 
       const mockBrand = {
@@ -182,7 +194,7 @@ describe('BrandController', () => {
         updatedAt: '2025-01-01T00:00:00.000Z',
       };
 
-      mockService.createBrand.mockResolvedValue(mockBrand);
+      mockService.createBrand.mockResolvedValue(mockBrand as any);
 
       const response = await brandController.createBrand(request);
       const body = await response.json();
@@ -190,6 +202,112 @@ describe('BrandController', () => {
       expect(response.status).toBe(201);
       expect(body.id).toBe('test-brand-id');
       expect(body.name).toBe('Test Brand');
+    });
+  });
+
+  describe('updateBrand', () => {
+    it('should accept update without logos and return 200', async () => {
+      const formData = new FormData();
+      formData.append('colors', JSON.stringify([{ hex: '#FF0000' }]));
+
+      const request = { formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData) } as any as NextRequest;
+
+      const mockBrand = {
+        id: 'id-1',
+        name: 'Brand',
+        colors: [{ hex: '#FF0000', allowAsBackground: true }],
+        logos: [],
+        taglinesAllowed: [],
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T01:00:00.000Z',
+      };
+
+      mockService.updateBrand.mockResolvedValue(mockBrand as any);
+
+      const response = await brandController.updateBrand(request, 'id-1');
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.id).toBe('id-1');
+    });
+
+    it('should map mismatch logos/files to 422', async () => {
+      const formData = new FormData();
+      formData.append('colors', JSON.stringify([{ hex: '#FF0000' }]));
+      formData.append('logos', JSON.stringify([{ type: 'primary' }]));
+      // Missing logoFile0
+
+      const request = { formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData) } as any as NextRequest;
+
+      mockService.updateBrand.mockRejectedValue(new ValidationError('Expected 1 logo files, but received 0'));
+
+      const response = await brandController.updateBrand(request, 'id-1');
+      const body = await response.json();
+
+      expect(response.status).toBe(422);
+      expect(body.code).toBe('UNPROCESSABLE_ENTITY');
+      expect(body.message).toContain('Expected 1 logo files');
+    });
+
+    it('should return 404 when brand not found', async () => {
+      const formData = new FormData();
+      formData.append('logos', JSON.stringify([{ type: 'primary' }]));
+      formData.append('logoFile0', new File(['test'], 'logo.svg', { type: 'image/svg+xml' }));
+
+      const request = { formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData) } as any as NextRequest;
+
+      mockService.updateBrand.mockResolvedValue(null);
+
+      const response = await brandController.updateBrand(request, 'missing-id');
+      const body = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(body.code).toBe('NOT_FOUND');
+    });
+
+    it('should map ValidationError to 422', async () => {
+      const formData = new FormData();
+      formData.append('logos', JSON.stringify([{ type: 'primary' }]));
+      formData.append('logoFile0', new File(['test'], 'logo.svg', { type: 'image/svg+xml' }));
+
+      const request = { formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData) } as any as NextRequest;
+
+      mockService.updateBrand.mockRejectedValue(new ValidationError('Invalid HEX color', 'colors.0.hex'));
+
+      const response = await brandController.updateBrand(request, 'id-1');
+      const body = await response.json();
+
+      expect(response.status).toBe(422);
+      expect(body.code).toBe('UNPROCESSABLE_ENTITY');
+      expect(body.field).toBe('colors.0.hex');
+    });
+
+    it('should return 200 with brand data on success', async () => {
+      const formData = new FormData();
+      formData.append('colors', JSON.stringify([{ hex: '#1A5E63' }]));
+      formData.append('logos', JSON.stringify([{ type: 'primary' }]));
+      formData.append('taglinesAllowed', JSON.stringify(['ok']));
+      formData.append('logoFile0', new File(['test'], 'logo.svg', { type: 'image/svg+xml' }));
+
+      const request = { formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData) } as any as NextRequest;
+
+      const mockBrand = {
+        id: 'id-1',
+        name: 'Brand',
+        colors: [{ hex: '#1A5E63', allowAsBackground: true }],
+        logos: [{ id: 'lg_1', type: 'primary', url: 'url', mime: 'image/svg+xml' }],
+        taglinesAllowed: ['ok'],
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T01:00:00.000Z',
+      };
+
+      mockService.updateBrand.mockResolvedValue(mockBrand as any);
+
+      const response = await brandController.updateBrand(request, 'id-1');
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.id).toBe('id-1');
     });
   });
 

@@ -1,0 +1,88 @@
+BrandRulesInput:
+  type: object
+  required:
+    - prohibitedClaims
+    - tone
+    - logoUsage
+    - sensitive
+  properties:
+    prohibitedClaims:
+      type: array
+      maxItems: 5000
+      items:
+        type: string
+    tone:
+      type: object
+      required: [allowed, bannedWords]
+      properties:
+        allowed:
+          type: array
+          items:
+            type: string
+            enum: [formal, friendly, playful, authoritative]
+        bannedWords:
+          type: array
+          maxItems: 5000
+          items:
+            type: string
+    logoUsage:
+      type: object
+      required: [allowedPositions, bannedBackgrounds, invertOnDark, minClearSpaceRatio]
+      properties:
+        allowedPositions:
+          type: array
+          items:
+            type: string
+            enum: [top-left, top-right, bottom-left, bottom-right, center]
+        bannedBackgrounds:
+          type: array
+          items:
+            type: string
+            enum: [patterned, image, video, gradient, low-contrast]
+        invertOnDark:
+          type: boolean
+        minClearSpaceRatio:
+          type: number
+          minimum: 0
+          maximum: 1
+    sensitive:
+      type: object
+      required: [disallowCategories]
+      properties:
+        disallowCategories:
+          type: array
+          items:
+            type: string
+            enum: [politics, religion, health, alcohol, gambling, adult, financial]
+        minAudienceAge:
+          type: integer
+          minimum: 0
+          maximum: 120
+    requiredDisclaimers:
+      type: array
+      maxItems: 200
+      items:
+        type: string
+
+BrandRules:
+  type: object
+  required: [id, brandId, rules, createdAt, updatedAt]
+  properties:
+    id:
+      type: string
+      format: uuid
+    brandId:
+      $ref: './Common.yaml#/BrandId'
+    rules:
+      $ref: '#/BrandRulesInput'
+    createdAt:
+      $ref: './Common.yaml#/Timestamp'
+    updatedAt:
+      $ref: './Common.yaml#/Timestamp'
+
+BrandRulesList:
+  type: array
+  items:
+    $ref: '#/BrandRules'
+
+

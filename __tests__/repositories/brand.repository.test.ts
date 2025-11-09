@@ -3,21 +3,35 @@ import { BrandRepository } from '../../repositories/brand.repository';
 import { DatabaseError } from '../../lib/errors';
 
 // Mock Prisma Client
+let consoleErrorSpy: jest.SpyInstance;
+
+beforeAll(() => {
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  consoleErrorSpy.mockRestore();
+});
+
 const mockPrismaClient = {
   brand: {
     create: jest.fn(),
     findUnique: jest.fn(),
     findMany: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
   },
   color: {
     createMany: jest.fn(),
+    deleteMany: jest.fn(),
   },
   logo: {
     createMany: jest.fn(),
+    deleteMany: jest.fn(),
   },
   tagline: {
     createMany: jest.fn(),
+    deleteMany: jest.fn(),
   },
   $transaction: jest.fn(),
 };
@@ -28,6 +42,77 @@ describe('BrandRepository', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     brandRepository = new BrandRepository(mockPrismaClient as any);
+  });
+
+  describe('updateWithRelations', () => {
+    it('should replace colors, logos and taglines and bump updatedAt', async () => {
+      const id = 'brand-1';
+      const brandData = {
+        colors: [{ hex: '#1A5E63', allowAsBackground: true }],
+        logos: [{ type: 'primary', url: 'https://url/logo.svg', mime: 'image/svg+xml' }],
+        taglines: ['Hello'],
+      };
+
+      const mockResult = {
+        id,
+        name: 'Brand 1',
+        description: null,
+        createdAt: new Date('2025-01-01'),
+        updatedAt: new Date('2025-01-01T01:00:00Z'),
+        colors: [{ id: 1, brandId: id, role: null, hex: '#1A5E63', darkVariant: null, allowAsBackground: true }],
+        logos: [{ id: 1, brandId: id, type: 'primary', url: 'https://url/logo.svg', mime: 'image/svg+xml', sizeBytes: null, widthPx: null, heightPx: null, minClearSpaceRatio: null, allowedPositions: null, bannedBackgrounds: null, monochrome: null, invertOnDark: null }],
+        taglines: [{ id: 1, brandId: id, text: 'Hello' }],
+      };
+
+      mockPrismaClient.$transaction.mockImplementation(async (cb: any) => {
+        const tx = {
+          brand: {
+            findUnique: jest.fn()
+              .mockResolvedValueOnce({ id }) // existence check
+              .mockResolvedValueOnce(mockResult), // final fetch
+            update: jest.fn().mockResolvedValue({ id }),
+          },
+          color: {
+            deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+            createMany: jest.fn().mockResolvedValue({ count: 1 }),
+          },
+          logo: {
+            deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+            createMany: jest.fn().mockResolvedValue({ count: 1 }),
+          },
+          tagline: {
+            deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+            createMany: jest.fn().mockResolvedValue({ count: 1 }),
+          },
+        };
+        return cb(tx);
+      });
+
+      const repository = new BrandRepository(mockPrismaClient as any);
+      const result = await repository.updateWithRelations(id, brandData as any);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(id);
+      expect(mockPrismaClient.$transaction).toHaveBeenCalled();
+    });
+
+    it('should return null when brand not found', async () => {
+      const id = 'missing';
+
+      mockPrismaClient.$transaction.mockImplementation(async (cb: any) => {
+        const tx = {
+          brand: {
+            findUnique: jest.fn().mockResolvedValue(null),
+          },
+        };
+        return cb(tx);
+      });
+
+      const repository = new BrandRepository(mockPrismaClient as any);
+      const result = await repository.updateWithRelations(id, { logos: [] } as any);
+
+      expect(result).toBeNull();
+    });
   });
 
   describe('createWithRelations', () => {

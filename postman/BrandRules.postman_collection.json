@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "AdCompass - Brand Rules",
+    "_postman_id": "adcompass-brand-rules",
+    "description": "Collection for Brand Rules endpoints (JSON/YAML). Uses environment variable {{baseUrl}} and collection variable {{brandId}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "brandId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Brand Rules (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prohibitedClaims\": [\"líder absoluto\", \"garantizado\"],\n  \"tone\": {\n    \"allowed\": [\"friendly\"],\n    \"bannedWords\": [\"gratis\", \"milagro\"]\n  },\n  \"logoUsage\": {\n    \"allowedPositions\": [\"top-left\", \"center\"],\n    \"bannedBackgrounds\": [\"video\", \"low-contrast\"],\n    \"invertOnDark\": true,\n    \"minClearSpaceRatio\": 0.125\n  },\n  \"sensitive\": {\n    \"disallowCategories\": [\"alcohol\", \"adult\"],\n    \"minAudienceAge\": 18\n  },\n  \"requiredDisclaimers\": [\"Sujeto a bases y condiciones\"]\n}"
+        },
+        "description": "Creates rules for a brand. Returns 201 or 409 if already exists."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Created', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "try {",
+              "  const data = pm.response.json();",
+              "  if (data.brandId) {",
+              "    pm.environment.set('lastBrandId', data.brandId);",
+              "  }",
+              "} catch(e) {}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Brand Rules (YAML)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-yaml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "prohibitedClaims: [\"líder absoluto\", \"garantizado\"]\ntone:\n  allowed: [friendly]\n  bannedWords: [\"gratis\", \"milagro\"]\nlogoUsage:\n  allowedPositions: [top-left, center]\n  bannedBackgrounds: [video, low-contrast]\n  invertOnDark: true\n  minClearSpaceRatio: 0.125\nsensitive:\n  disallowCategories: [alcohol, adult]\n  minAudienceAge: 18\nrequiredDisclaimers: [\"Sujeto a bases y condiciones\"]\n"
+        },
+        "description": "Creates rules for a brand using YAML payload."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Brand Rules",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules"
+          ]
+        },
+        "description": "Returns rules for the brand."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Brand Rules (JSON)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prohibitedClaims\": [],\n  \"tone\": {\n    \"allowed\": [\"formal\", \"authoritative\"],\n    \"bannedWords\": []\n  },\n  \"logoUsage\": {\n    \"allowedPositions\": [\"top-right\"],\n    \"bannedBackgrounds\": [\"patterned\"],\n    \"invertOnDark\": false,\n    \"minClearSpaceRatio\": 0.2\n  },\n  \"sensitive\": {\n    \"disallowCategories\": [\"politics\", \"religion\"]\n  },\n  \"requiredDisclaimers\": []\n}"
+        },
+        "description": "Updates rules for a brand. Returns 404 if rules do not exist."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Brand Rules (YAML)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-yaml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "prohibitedClaims: []\ntone:\n  allowed: [formal, authoritative]\n  bannedWords: []\nlogoUsage:\n  allowedPositions: [top-right]\n  bannedBackgrounds: [patterned]\n  invertOnDark: false\n  minClearSpaceRatio: 0.2\nsensitive:\n  disallowCategories: [politics, religion]\nrequiredDisclaimers: []\n"
+        },
+        "description": "Updates rules using YAML payload."
+      },
+      "response": []
+    },
+    {
+      "name": "List All Brand Rules",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/rules",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "rules"
+          ]
+        },
+        "description": "Lists all brand rules."
+      },
+      "response": []
+    }
+  ]
+}
+
+
