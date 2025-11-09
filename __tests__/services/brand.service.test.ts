@@ -478,6 +478,15 @@ describe('BrandService', () => {
 
     it('should throw ValidationError when logos/files count mismatch', async () => {
       const id = 'brand';
+      // Ensure brand exists so the service reaches the mismatch validation
+      (mockRepository.findById as jest.Mock).mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date('2025-01-01T00:00:00Z'),
+        updatedAt: new Date('2025-01-01T00:00:00Z'),
+        colors: [], logos: [], taglines: [],
+      } as any);
       await expect(brandService.updateBrand(id, {
         logos: [{ type: 'primary' as const }, { type: 'stacked' as const }],
         logoFiles: [{

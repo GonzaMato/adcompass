@@ -40,3 +40,8 @@ export type {
   ErrorResponse,
 } from './error.types';
 
+// Brand Rules (V2) types
+export type {
+  BrandRulesInput,
+} from './brand-rules.types';
+

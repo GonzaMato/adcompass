@@ -37,7 +37,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"prohibitedClaims\": [\"líder absoluto\", \"garantizado\"],\n  \"tone\": {\n    \"allowed\": [\"friendly\"],\n    \"bannedWords\": [\"gratis\", \"milagro\"]\n  },\n  \"logoUsage\": {\n    \"allowedPositions\": [\"top-left\", \"center\"],\n    \"bannedBackgrounds\": [\"video\", \"low-contrast\"],\n    \"invertOnDark\": true,\n    \"minClearSpaceRatio\": 0.125\n  },\n  \"sensitive\": {\n    \"disallowCategories\": [\"alcohol\", \"adult\"],\n    \"minAudienceAge\": 18\n  },\n  \"requiredDisclaimers\": [\"Sujeto a bases y condiciones\"]\n}"
+          "raw": "{\n  \"voice\": {\n    \"traits\": {\n      \"formality\": [2,4],\n      \"warmth\": [3,5],\n      \"energy\": [2,4],\n      \"humor\": [1,2],\n      \"confidence\": [3,5]\n    },\n    \"lexicon\": {\n      \"bannedWords\": [\"gratis\", \"milagro\"],\n      \"bannedPatterns\": [\"\\\\b(líder absoluto|garantizado)\\\\b\"],\n      \"ctaWhitelist\": [\"Comprar ahora\", \"Descubrí más\"],\n      \"readability\": { \"targetGrade\": 8, \"maxExclamations\": 1, \"allowEmojis\": false }\n    }\n  },\n  \"logoUsage\": {\n    \"minSizePx\": { \"width\": 120, \"height\": 40 },\n    \"minClearSpaceX\": 0.125,\n    \"aspectRatioLock\": true,\n    \"placementGrid\": [\"top-left\", \"center\"],\n    \"background\": { \"minContrastRatio\": 4.5, \"invertThresholdLuminance\": 0.35, \"maxBackgroundComplexity\": 0.25, \"blurOverlayRequiredAboveComplexity\": true }\n  },\n  \"claims\": {\n    \"bannedPatterns\": [\"\\\\b(mejor|cura|garantizad(a|o))\\\\b\"],\n    \"disclaimers\": [{ \"template\": \"Sujeto a bases y condiciones\", \"regions\": [\"AR\"], \"channels\": [\"meta\"] }]\n  },\n  \"sensitive\": {\n    \"policies\": { \"alcohol\": { \"allowed\": \"allowed\", \"minAudienceAge\": 18, \"regions\": [\"AR\"], \"channels\": [\"meta\"] } }\n  },\n  \"accessibility\": { \"wcag\": { \"minContrastRatio\": 4.5, \"minFontSizePx\": 14, \"captionsRequired\": true, \"altTextRequired\": true } },\n  \"platformRules\": { \"meta\": { \"maxTextOnImagePct\": 20, \"maxHashtags\": 5 } },\n  \"governance\": { \"severityDefault\": \"hard_fail\", \"checks\": [{ \"id\": \"contrast\", \"description\": \"Contraste AA\", \"severity\": \"hard_fail\", \"evaluator\": \"contrast\", \"remediationHint\": \"Invertir logo o agregar overlay\" }] }\n}"
         },
         "description": "Creates rules for a brand. Returns 201 or 409 if already exists."
       },
@@ -86,14 +86,14 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "prohibitedClaims: [\"líder absoluto\", \"garantizado\"]\ntone:\n  allowed: [friendly]\n  bannedWords: [\"gratis\", \"milagro\"]\nlogoUsage:\n  allowedPositions: [top-left, center]\n  bannedBackgrounds: [video, low-contrast]\n  invertOnDark: true\n  minClearSpaceRatio: 0.125\nsensitive:\n  disallowCategories: [alcohol, adult]\n  minAudienceAge: 18\nrequiredDisclaimers: [\"Sujeto a bases y condiciones\"]\n"
+          "raw": "voice:\n  traits:\n    formality: [2,4]\n    warmth: [3,5]\n    energy: [2,4]\n    humor: [1,2]\n    confidence: [3,5]\n  lexicon:\n    bannedWords: [\"gratis\", \"milagro\"]\n    bannedPatterns: [\"\\\\b(líder absoluto|garantizado)\\\\b\"]\n    ctaWhitelist: [\"Comprar ahora\", \"Descubrí más\"]\n    readability: { targetGrade: 8, maxExclamations: 1, allowEmojis: false }\nlogoUsage:\n  minSizePx: { width: 120, height: 40 }\n  minClearSpaceX: 0.125\n  aspectRatioLock: true\n  placementGrid: [top-left, center]\n  background:\n    minContrastRatio: 4.5\n    invertThresholdLuminance: 0.35\n    maxBackgroundComplexity: 0.25\n    blurOverlayRequiredAboveComplexity: true\nclaims:\n  bannedPatterns: [\"\\\\b(mejor|cura|garantizad(a|o))\\\\b\"]\n  disclaimers:\n    - template: \"Sujeto a bases y condiciones\"\n      regions: [AR]\n      channels: [meta]\nsensitive:\n  policies:\n    alcohol:\n      allowed: allowed\n      minAudienceAge: 18\n      regions: [AR]\n      channels: [meta]\naccessibility:\n  wcag:\n    minContrastRatio: 4.5\n    minFontSizePx: 14\n    captionsRequired: true\n    altTextRequired: true\nplatformRules:\n  meta:\n    maxTextOnImagePct: 20\n    maxHashtags: 5\ngovernance:\n  severityDefault: hard_fail\n  checks:\n    - id: contrast\n      description: Contraste AA\n      severity: hard_fail\n      evaluator: contrast\n      remediationHint: Invertir logo o agregar overlay\n"
         },
         "description": "Creates rules for a brand using YAML payload."
       },
       "response": []
     },
     {
-      "name": "Get Brand Rules",
+      "name": "List Brand Rules by Brand",
       "request": {
         "method": "GET",
         "url": {
@@ -108,12 +108,33 @@
             "rules"
           ]
         },
-        "description": "Returns rules for the brand."
+        "description": "Returns rules list for the brand."
       },
       "response": []
     },
     {
-      "name": "Update Brand Rules (JSON)",
+      "name": "Get Brand Rule by ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules/{{ruleId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules",
+            "{{ruleId}}"
+          ]
+        },
+        "description": "Get a rule by id for a brand."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Brand Rule by ID (JSON)",
       "request": {
         "method": "PUT",
         "header": [
@@ -123,7 +144,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules/{{ruleId}}",
           "host": [
             "{{baseUrl}}"
           ],
@@ -131,19 +152,20 @@
             "api",
             "brands",
             "{{brandId}}",
-            "rules"
+            "rules",
+            "{{ruleId}}"
           ]
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"prohibitedClaims\": [],\n  \"tone\": {\n    \"allowed\": [\"formal\", \"authoritative\"],\n    \"bannedWords\": []\n  },\n  \"logoUsage\": {\n    \"allowedPositions\": [\"top-right\"],\n    \"bannedBackgrounds\": [\"patterned\"],\n    \"invertOnDark\": false,\n    \"minClearSpaceRatio\": 0.2\n  },\n  \"sensitive\": {\n    \"disallowCategories\": [\"politics\", \"religion\"]\n  },\n  \"requiredDisclaimers\": []\n}"
+          "raw": "{\n  \"voice\": {\n    \"traits\": {\n      \"formality\": [4,5],\n      \"warmth\": [2,3],\n      \"energy\": [2,3],\n      \"humor\": [1,1],\n      \"confidence\": [4,5]\n    }\n  },\n  \"logoUsage\": {\n    \"minSizePx\": { \"width\": 160, \"height\": 48 },\n    \"minClearSpaceX\": 0.2,\n    \"placementGrid\": [\"top-right\"]\n  },\n  \"claims\": { \"bannedPatterns\": [] },\n  \"sensitive\": { \"policies\": { \"politics\": { \"allowed\": \"disallowed\" }, \"religion\": { \"allowed\": \"disallowed\" } } },\n  \"accessibility\": { \"wcag\": { \"minContrastRatio\": 4.5 } }\n}"
         },
-        "description": "Updates rules for a brand. Returns 404 if rules do not exist."
+        "description": "Updates a rule by id for a brand. Returns 404 if not found."
       },
       "response": []
     },
     {
-      "name": "Update Brand Rules (YAML)",
+      "name": "Update Brand Rule by ID (YAML)",
       "request": {
         "method": "PUT",
         "header": [
@@ -153,7 +175,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules",
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules/{{ruleId}}",
           "host": [
             "{{baseUrl}}"
           ],
@@ -161,14 +183,36 @@
             "api",
             "brands",
             "{{brandId}}",
-            "rules"
+            "rules",
+            "{{ruleId}}"
           ]
         },
         "body": {
           "mode": "raw",
-          "raw": "prohibitedClaims: []\ntone:\n  allowed: [formal, authoritative]\n  bannedWords: []\nlogoUsage:\n  allowedPositions: [top-right]\n  bannedBackgrounds: [patterned]\n  invertOnDark: false\n  minClearSpaceRatio: 0.2\nsensitive:\n  disallowCategories: [politics, religion]\nrequiredDisclaimers: []\n"
+          "raw": "voice:\n  traits:\n    formality: [4,5]\n    warmth: [2,3]\n    energy: [2,3]\n    humor: [1,1]\n    confidence: [4,5]\nlogoUsage:\n  minSizePx: { width: 160, height: 48 }\n  minClearSpaceX: 0.2\n  placementGrid: [top-right]\nclaims:\n  bannedPatterns: []\nsensitive:\n  policies:\n    politics: { allowed: disallowed }\n    religion: { allowed: disallowed }\naccessibility:\n  wcag: { minContrastRatio: 4.5 }\n"
         },
-        "description": "Updates rules using YAML payload."
+        "description": "Updates a rule by id using YAML payload."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Brand Rule by ID",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/brands/{{brandId}}/rules/{{ruleId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "brands",
+            "{{brandId}}",
+            "rules",
+            "{{ruleId}}"
+          ]
+        },
+        "description": "Deletes a rule by id for a brand."
       },
       "response": []
     },

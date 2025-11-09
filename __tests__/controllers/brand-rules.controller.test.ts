@@ -24,8 +24,10 @@ describe('BrandRulesController', () => {
   beforeEach(() => {
     mockService = {
       createRules: jest.fn(),
-      getRules: jest.fn(),
-      updateRules: jest.fn(),
+      listByBrand: jest.fn(),
+      getById: jest.fn(),
+      updateById: jest.fn(),
+      deleteById: jest.fn(),
       listAll: jest.fn(),
     } as any;
 
@@ -55,17 +57,6 @@ describe('BrandRulesController', () => {
       expect(body.id).toBe('r1');
     });
 
-    it('should map ConflictError to 409', async () => {
-      const req = makeRequest('{}');
-      mockService.createRules.mockRejectedValue(new ConflictError('Rules already exist for this brand'));
-
-      const res = await controller.create(req, 'b1');
-      const body = await res.json();
-
-      expect(res.status).toBe(409);
-      expect(body.code).toBe('CONFLICT');
-    });
-
     it('should map ValidationError to 422', async () => {
       const req = makeRequest('{}');
       mockService.createRules.mockRejectedValue(new ValidationError('Invalid schema'));
@@ -89,34 +80,41 @@ describe('BrandRulesController', () => {
     });
   });
 
-  describe('getOne', () => {
-    it('should return 200 when found', async () => {
-      mockService.getRules.mockResolvedValue({ id: 'r1' } as any);
+  describe('listByBrand', () => {
+    it('should return 200 with list', async () => {
+      mockService.listByBrand.mockResolvedValue([{ id: 'r1' }] as any);
 
-      const res = await controller.getOne({} as any, 'b1');
+      const res = await controller.listByBrand({} as any, 'b1');
       const body = await res.json();
 
+      expect(res.status).toBe(200);
+      expect(Array.isArray(body)).toBe(true);
+      expect(body[0].id).toBe('r1');
+    });
+  });
+
+  describe('getById/updateById/deleteById', () => {
+    it('getById should return 200 when found', async () => {
+      mockService.getById.mockResolvedValue({ id: 'r1' } as any);
+      const res = await controller.getById({} as any, 'b1', 'r1');
+      const body = await res.json();
       expect(res.status).toBe(200);
       expect(body.id).toBe('r1');
     });
 
-    it('should return 404 when not found', async () => {
-      mockService.getRules.mockRejectedValue(new NotFoundError('Brand rules not found'));
-
-      const res = await controller.getOne({} as any, 'b1');
+    it('getById should return 404 when not found', async () => {
+      mockService.getById.mockRejectedValue(new NotFoundError('Brand rule not found'));
+      const res = await controller.getById({} as any, 'b1', 'missing');
       const body = await res.json();
-
       expect(res.status).toBe(404);
       expect(body.code).toBe('NOT_FOUND');
     });
-  });
 
-  describe('update', () => {
     it('should return 200 on success', async () => {
       const req = makeRequest('{}');
-      mockService.updateRules.mockResolvedValue({ id: 'r1' } as any);
+      mockService.updateById.mockResolvedValue({ id: 'r1' } as any);
 
-      const res = await controller.update(req, 'b1');
+      const res = await controller.updateById(req, 'b1', 'r1');
       const body = await res.json();
 
       expect(res.status).toBe(200);
@@ -125,9 +123,9 @@ describe('BrandRulesController', () => {
 
     it('should map NotFoundError to 404', async () => {
       const req = makeRequest('{}');
-      mockService.updateRules.mockRejectedValue(new NotFoundError('Brand rules not found'));
+      mockService.updateById.mockRejectedValue(new NotFoundError('Brand rule not found'));
 
-      const res = await controller.update(req, 'b1');
+      const res = await controller.updateById(req, 'b1', 'missing');
       const body = await res.json();
 
       expect(res.status).toBe(404);
@@ -136,13 +134,21 @@ describe('BrandRulesController', () => {
 
     it('should map ValidationError to 422', async () => {
       const req = makeRequest('{}');
-      mockService.updateRules.mockRejectedValue(new ValidationError('Bad input'));
+      mockService.updateById.mockRejectedValue(new ValidationError('Bad input'));
 
-      const res = await controller.update(req, 'b1');
+      const res = await controller.updateById(req, 'b1', 'r1');
       const body = await res.json();
 
       expect(res.status).toBe(422);
       expect(body.code).toBe('UNPROCESSABLE_ENTITY');
+    });
+
+    it('deleteById should return 200 on success', async () => {
+      mockService.deleteById.mockResolvedValue();
+      const res = await controller.deleteById({} as any, 'b1', 'r1');
+      const body = await res.json();
+      expect(res.status).toBe(200);
+      expect(body.success).toBe(true);
     });
   });
 
