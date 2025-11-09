@@ -143,23 +143,53 @@ export class BrandService {
       throw new NotFoundError('Brand not found');
     }
 
-    // Validate logo files count matches logos array
-    if (input.logos && input.logoFiles.length !== input.logos.length) {
-      throw new ValidationError(
-        `Expected ${input.logos.length} logo files, but received ${input.logoFiles.length}`
-      );
-    }
-
-    // Validate each logo file
-    for (const file of input.logoFiles) {
-      const validation = validateLogoFile(file as any);
-      if (!validation.valid) {
-        throw new ValidationError(validation.error || 'Invalid logo file');
+    // Validate logo files vs logos metadata presence
+    if (input.logos) {
+      if (input.logoFiles.length !== input.logos.length) {
+        throw new ValidationError(
+          `Expected ${input.logos.length} logo files, but received ${input.logoFiles.length}`
+        );
+      }
+      // Validate each logo file
+      for (const file of input.logoFiles) {
+        const validation = validateLogoFile(file as any);
+        if (!validation.valid) {
+          throw new ValidationError(validation.error || 'Invalid logo file');
+        }
+      }
+    } else {
+      // No new logos provided: must not receive files
+      if (input.logoFiles.length > 0) {
+        throw new ValidationError('Logo files provided without logos metadata', 'logos');
       }
     }
 
-    // Upload logos to GCS (use existing brand id as path)
-    const uploadedLogos = input.logos
+    // Build preserved logos from existing by URL list (if provided)
+    const existingUrls = new Set(input.existingLogoUrls || []);
+    const preservedLogos = input.existingLogoUrls
+      ? input.existingLogoUrls.map((url) => {
+          const found = existingBrand.logos.find((l: any) => l.url === url);
+          if (!found) {
+            throw new ValidationError(`Logo URL not found in brand: ${url}`, 'logoUrls');
+          }
+          return {
+            type: found.type,
+            url: found.url,
+            mime: found.mime,
+            sizeBytes: found.sizeBytes ?? undefined,
+            widthPx: found.widthPx ?? undefined,
+            heightPx: found.heightPx ?? undefined,
+            minClearSpaceRatio: found.minClearSpaceRatio ?? undefined,
+            allowedPositions: found.allowedPositions ?? undefined,
+            bannedBackgrounds: found.bannedBackgrounds ?? undefined,
+            monochrome: found.monochrome ?? undefined,
+            invertOnDark: found.invertOnDark ?? undefined,
+          };
+        })
+      : [];
+
+    // Upload new logos to GCS (use existing brand id as path)
+    const uploadedNewLogos = input.logos
       ? await Promise.all(
           input.logoFiles.map(async (file, index) => {
             const logoInput = input.logos![index];
@@ -183,13 +213,28 @@ export class BrandService {
             };
           })
         )
-      : undefined;
+      : [];
+
+    // Combine preserved + new, dedupe by URL
+    const combinedByUrl = new Map<string, any>();
+    for (const l of [...preservedLogos, ...uploadedNewLogos]) {
+      if (!combinedByUrl.has(l.url)) {
+        combinedByUrl.set(l.url, l);
+      }
+    }
+    const combined = Array.from(combinedByUrl.values());
+
+    // Enforce max logos if replacement requested
+    const willReplaceLogos = (input.existingLogoUrls && input.existingLogoUrls.length > 0) || (!!input.logos && input.logos.length > 0);
+    if (willReplaceLogos && combined.length > 6) {
+      throw new ValidationError('Maximum 6 logos allowed', 'logos');
+    }
 
     // Replace brand relations in database
     const updateData: UpdateBrandData = {
       // name/description unchanged in this operation
       colors: input.colors,
-      logos: uploadedLogos,
+      logos: willReplaceLogos ? combined : undefined,
       taglines: input.taglinesAllowed,
     };
 
@@ -231,6 +276,17 @@ export class BrandService {
       createdAt: brand.createdAt.toISOString(),
       updatedAt: brand.updatedAt.toISOString(),
     };
+  }
+
+  async deleteBrand(id: string): Promise<void> {
+    // Ensure brand exists
+    const existingBrand = await this.repository.findById(id);
+    if (!existingBrand) {
+      throw new NotFoundError('Brand not found');
+    }
+    // Delete storage assets then DB
+    await this.storage.deleteLogos(id);
+    await this.repository.delete(id);
   }
 }
 

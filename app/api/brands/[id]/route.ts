@@ -13,4 +13,10 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   return brandController.updateBrand(request, id);
 }
 
+// DELETE /api/brands/{id} - Delete a brand and its assets
+export async function DELETE(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  return brandController.deleteBrand(id);
+}
+
 
