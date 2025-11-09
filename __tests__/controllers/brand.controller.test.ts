@@ -2,7 +2,7 @@ import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { NextRequest } from 'next/server';
 import { BrandController } from '../../controllers/brand.controller';
 import { BrandService } from '../../services/brand.service';
-import { ValidationError, StorageError, DatabaseError } from '../../lib/errors';
+import { ValidationError, StorageError, DatabaseError, NotFoundError } from '../../lib/errors';
 
 // Mock the service
 let consoleErrorSpy: ReturnType<typeof jest.spyOn>;
@@ -206,6 +206,34 @@ describe('BrandController', () => {
   });
 
   describe('updateBrand', () => {
+    it('should accept logoUrls (existing URLs) without new logos', async () => {
+      const formData = new FormData();
+      formData.append('logoUrls', JSON.stringify(['https://gcs/bucket/brands/id/logo.svg']));
+
+      const request = { formData: jest.fn<() => Promise<FormData>>().mockResolvedValue(formData) } as any as NextRequest;
+
+      const mockBrand = {
+        id: 'id-1',
+        name: 'Brand',
+        colors: [],
+        logos: [{ id: 'lg_1', type: 'primary', url: 'https://gcs/bucket/brands/id/logo.svg', mime: 'image/svg+xml' }],
+        taglinesAllowed: [],
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T01:00:00.000Z',
+      };
+
+      mockService.updateBrand.mockResolvedValue(mockBrand as any);
+
+      const response = await brandController.updateBrand(request, 'id-1');
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.logos).toHaveLength(1);
+      expect(mockService.updateBrand).toHaveBeenCalledWith('id-1', expect.objectContaining({
+        existingLogoUrls: ['https://gcs/bucket/brands/id/logo.svg'],
+      }));
+    });
+
     it('should accept update without logos and return 200', async () => {
       const formData = new FormData();
       formData.append('colors', JSON.stringify([{ hex: '#FF0000' }]));
@@ -308,6 +336,25 @@ describe('BrandController', () => {
 
       expect(response.status).toBe(200);
       expect(body.id).toBe('id-1');
+    });
+  });
+
+  describe('deleteBrand', () => {
+    it('should return 204 on successful delete', async () => {
+      mockService.deleteBrand = jest.fn().mockResolvedValue(undefined as any);
+
+      const response = await brandController.deleteBrand('id-1');
+      expect(response.status).toBe(204);
+    });
+
+    it('should return 404 when brand not found', async () => {
+      mockService.deleteBrand = jest.fn().mockRejectedValue(new NotFoundError('Brand not found'));
+
+      const response = await brandController.deleteBrand('missing-id');
+      const body = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(body.code).toBe('NOT_FOUND');
     });
   });
 
