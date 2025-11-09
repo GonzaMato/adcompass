@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fixService } from '../../../../../services/fix.service';
-import { DatabaseError, NotFoundError, ValidationError } from '../../../../../lib/errors';
+import { evaluationRepository } from '../../../repositories/evaluation.repository';
+import { DatabaseError, NotFoundError, ValidationError } from '../../../lib/errors';
 
-export async function POST(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id: evaluationId } = await context.params;
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const brandId = searchParams.get('brandId') || undefined;
+  const ruleId = searchParams.get('ruleId') || undefined;
+
   try {
-    const created = await fixService.fix(evaluationId);
-    return NextResponse.json(created, { status: 200 });
+    if (!brandId || typeof brandId !== 'string') {
+      throw new ValidationError('Missing or invalid brandId', 'brandId');
+    }
+    if (!ruleId || typeof ruleId !== 'string') {
+      throw new ValidationError('Missing or invalid ruleId', 'ruleId');
+    }
+
+    const evaluation = await evaluationRepository.findLatestByBrandAndRule(brandId, ruleId);
+    if (!evaluation) {
+      throw new NotFoundError('Evaluation not found');
+    }
+
+    return NextResponse.json({ evaluation }, { status: 200 });
   } catch (error) {
     if (error instanceof ValidationError) {
       return NextResponse.json(
@@ -28,10 +42,6 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ i
     }
 
     const code = (error as any)?.code as string | undefined;
-    const status = (error as any)?.status as number | undefined;
-    const details = (error as any)?.details;
-
-    // Map by code as well (tests may mock generic Errors with code)
     if (code === 'BAD_REQUEST') {
       return NextResponse.json(
         { code: 'BAD_REQUEST', message: (error as any)?.message || 'Bad request' },
@@ -51,36 +61,13 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ i
       );
     }
 
-    if (code === 'UPSTREAM_TIMEOUT') {
-      return NextResponse.json(
-        { code: 'UPSTREAM_TIMEOUT', message: 'Upstream request timed out' },
-        { status: 504 }
-      );
-    }
-    if (code === 'UPSTREAM_ERROR') {
-      return NextResponse.json(
-        {
-          code: 'UPSTREAM_ERROR',
-          message: 'Upstream service returned an error',
-          upstreamStatus: status,
-          details,
-        },
-        { status: 502 }
-      );
-    }
-    if (code === 'UPSTREAM_CONFIG_ERROR') {
-      return NextResponse.json(
-        { code: 'UPSTREAM_CONFIG_ERROR', message: 'N8N_FIX_URL is not configured' },
-        { status: 500 }
-      );
-    }
-
-    console.error('Unexpected error in POST /api/evaluations/[id]/fix:', error);
+    console.error('Unexpected error in GET /api/evaluations:', error);
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' },
       { status: 500 }
     );
   }
 }
+
 
 
