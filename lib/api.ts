@@ -27,6 +27,17 @@ export async function apiRequest<T>(
     throw new Error(error.message || 'API request failed');
   }
 
+  // Handle 204 No Content or empty body
+  if (response.status === 204) {
+    return undefined as unknown as T;
+  }
+  const contentType = response.headers.get('content-type');
+  const contentLength = response.headers.get('content-length');
+  if (!contentType || contentLength === '0') {
+    return undefined as unknown as T;
+  }
+
+  // Default: parse JSON
   return response.json();
 }
 
@@ -51,6 +62,17 @@ export async function apiFormRequest<T>(
     throw new Error(error.message || 'API request failed');
   }
 
+  // Handle 204 No Content or empty body
+  if (response.status === 204) {
+    return undefined as unknown as T;
+  }
+  const contentType = response.headers.get('content-type');
+  const contentLength = response.headers.get('content-length');
+  if (!contentType || contentLength === '0') {
+    return undefined as unknown as T;
+  }
+
+  // Default: parse JSON
   return response.json();
 }
 
@@ -67,6 +89,31 @@ export const brandsAPI = {
   
   delete: (id: string) =>
     apiRequest<void>(`/brands/${id}`, {
+      method: 'DELETE',
+    }),
+};
+
+// Brand Rules API endpoints
+export const brandRulesAPI = {
+  list: (brandId: string) => apiRequest<any[]>(`/brands/${brandId}/rules`),
+
+  get: (brandId: string, ruleId: string) =>
+    apiRequest<any>(`/brands/${brandId}/rules/${ruleId}`),
+
+  create: (brandId: string, rules: unknown) =>
+    apiRequest<any>(`/brands/${brandId}/rules`, {
+      method: 'POST',
+      body: JSON.stringify(rules),
+    }),
+
+  update: (brandId: string, ruleId: string, rules: unknown) =>
+    apiRequest<any>(`/brands/${brandId}/rules/${ruleId}`, {
+      method: 'PUT',
+      body: JSON.stringify(rules),
+    }),
+
+  delete: (brandId: string, ruleId: string) =>
+    apiRequest<void>(`/brands/${brandId}/rules/${ruleId}`, {
       method: 'DELETE',
     }),
 };
