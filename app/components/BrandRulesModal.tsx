@@ -267,7 +267,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
         resetDefaults();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error saving rules');
+      setError(err instanceof Error ? err.message : 'Error al guardar reglas');
     } finally {
       setLoading(false);
     }
@@ -280,9 +280,9 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
       <style>{sliderStyles}</style>
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div className="bg-neutral-900 rounded-lg p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-2xl font-bold text-white mb-2">{mode === 'edit' ? 'Edit Brand Rules' : 'Create Brand Rules'}</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{mode === 'edit' ? 'Editar Reglas de Marca' : 'Crear Reglas de Marca'}</h2>
         <p className="text-neutral-400 mb-6">
-          Define usage rules for: {brandName}
+          Define las reglas de uso para: {brandName}
         </p>
 
         {error && (
@@ -294,13 +294,13 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
         <div className="space-y-6">
           {/* Voice Section */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Brand Voice (Traits)</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Voz de Marca (Traits)</h3>
             
             <div className="space-y-5 mb-6">
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="block text-sm font-medium text-white">
-                    Formality
+                    Formalidad
                   </label>
                   <span className="text-sm font-semibold text-blue-400">
                     {formality}
@@ -323,7 +323,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="block text-sm font-medium text-white">
-                    Warmth
+                    Calidez
                   </label>
                   <span className="text-sm font-semibold text-blue-400">
                     {warmth}
@@ -338,15 +338,15 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
-                  <span>1 (Cold)</span>
-                  <span>10 (Warm)</span>
+                  <span>1 (Frío)</span>
+                  <span>10 (Cálido)</span>
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="block text-sm font-medium text-white">
-                    Energy
+                    Energía
                   </label>
                   <span className="text-sm font-semibold text-blue-400">
                     {energy}
@@ -361,8 +361,8 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
-                  <span>1 (Calm)</span>
-                  <span>10 (Energetic)</span>
+                  <span>1 (Calmado)</span>
+                  <span>10 (Enérgico)</span>
                 </div>
               </div>
 
@@ -392,7 +392,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="block text-sm font-medium text-white">
-                    Confidence
+                    Confianza
                   </label>
                   <span className="text-sm font-semibold text-blue-400">
                     {confidence}
@@ -407,18 +407,18 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-xs text-neutral-500 mt-2">
-                  <span>1 (Cautious)</span>
-                  <span>10 (Confident)</span>
+                  <span>1 (Cauteloso)</span>
+                  <span>10 (Confiado)</span>
                 </div>
               </div>
             </div>
 
             <div className="border-t border-neutral-700 pt-6 mb-6">
-              <h4 className="text-md font-semibold text-white mb-4">Readability</h4>
+              <h4 className="text-md font-semibold text-white mb-4">Legibilidad</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Reading Level (1-14)
+                    Nivel de Lectura (1-14)
                   </label>
                   <input
                     type="number"
@@ -428,12 +428,12 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     onChange={(e) => setTargetGrade(Math.min(14, Math.max(1, parseInt(e.target.value) || 8)))}
                     className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
-                  <p className="text-xs text-neutral-500 mt-1">8 = high school education</p>
+                  <p className="text-xs text-neutral-500 mt-1">8 = educación secundaria</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Max. Exclamations (0-5)
+                    Máx. Exclamaciones (0-5)
                   </label>
                   <input
                     type="number"
@@ -443,12 +443,12 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     onChange={(e) => setMaxExclamations(Math.min(5, Math.max(0, parseInt(e.target.value) || 1)))}
                     className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
-                  <p className="text-xs text-neutral-500 mt-1">Per text</p>
+                  <p className="text-xs text-neutral-500 mt-1">Por texto</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Allow Emojis
+                    Permitir Emojis
                   </label>
                   <button
                     type="button"
@@ -459,7 +459,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                         : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
                     }`}
                   >
-                    {allowEmojis ? '✓ Allowed' : '✗ Not allowed'}
+                    {allowEmojis ? '✓ Permitido' : '✗ No permitido'}
                   </button>
                 </div>
               </div>
@@ -467,7 +467,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-white mb-2">
-                Banned Words
+                Palabras Prohibidas
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -475,11 +475,11 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   value={bannedWordInput}
                   onChange={(e) => setBannedWordInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBannedWord())}
-                  placeholder="E.g: 'cheap', 'free'"
+                  placeholder="Ej: 'barato', 'gratis'"
                   className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
                 />
                 <Button onClick={handleAddBannedWord} disabled={!bannedWordInput.trim()}>
-                  Add
+                  Agregar
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -494,7 +494,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Banned Phrases
+                Frases Prohibidas
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -502,11 +502,11 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   value={bannedPhraseInput}
                   onChange={(e) => setBannedPhraseInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBannedPhrase())}
-                  placeholder="E.g: 'the best', 'guaranteed', '100%'"
+                  placeholder="Ej: 'el mejor', 'garantizado', '100%'"
                   className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
                 />
                 <Button onClick={handleAddBannedPhrase} disabled={!bannedPhraseInput.trim()}>
-                  Add
+                  Agregar
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -522,12 +522,12 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
           {/* Logo Usage Section */}
           <div className="border-t border-neutral-800 pt-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Logo Usage</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Uso del Logo</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Minimum Size (pixels)
+                  Tamaño Mínimo (píxeles)
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -535,7 +535,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     min="0"
                     value={minWidthPx}
                     onChange={(e) => setMinWidthPx(Math.max(0, parseInt(e.target.value) || 0))}
-                    placeholder="Width"
+                    placeholder="Ancho"
                     className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
                   <span className="text-neutral-500 self-center">×</span>
@@ -544,7 +544,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     min="0"
                     value={minHeightPx}
                     onChange={(e) => setMinHeightPx(Math.max(0, parseInt(e.target.value) || 0))}
-                    placeholder="Height"
+                    placeholder="Alto"
                     className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
                 </div>
@@ -552,7 +552,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Minimum Clear Space (0-5)
+                  Espacio Libre Mínimo (0-5)
                 </label>
                 <input
                   type="number"
@@ -564,7 +564,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                 />
                 <p className="text-xs text-neutral-500 mt-1">
-                  {minClearSpaceX}× of logo size
+                  {minClearSpaceX}× del tamaño del logo
                 </p>
               </div>
             </div>
@@ -572,7 +572,7 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
             <div className="mb-4">
               <label className="block text-sm font-medium text-white mb-2">
                 <span className="flex items-center gap-2">
-                  Lock Aspect Ratio
+                  Bloquear Aspecto (Aspect Ratio)
                   <button
                     type="button"
                     onClick={() => setAspectRatioLock(!aspectRatioLock)}
@@ -582,18 +582,18 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                         : 'bg-neutral-700 text-neutral-400 border border-neutral-600'
                     }`}
                   >
-                    {aspectRatioLock ? '🔒 Locked' : '🔓 Free'}
+                    {aspectRatioLock ? '🔒 Bloqueado' : '🔓 Libre'}
                   </button>
                 </span>
               </label>
               <p className="text-xs text-neutral-500">
-                {aspectRatioLock ? 'Logo must maintain its original proportions' : 'Logo distortion is allowed'}
+                {aspectRatioLock ? 'El logo debe mantener sus proporciones originales' : 'Se permite distorsionar el logo'}
               </p>
             </div>
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-white mb-2">
-                Allowed Positions
+                Posiciones Permitidas
               </label>
               <div className="flex flex-wrap gap-2">
                 {PLACEMENT_GRID_OPTIONS.map((placement) => (
@@ -614,11 +614,11 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
             </div>
 
             <div className="border-t border-neutral-700 pt-4">
-              <h4 className="text-md font-semibold text-white mb-4">Background Restrictions</h4>
+              <h4 className="text-md font-semibold text-white mb-4">Restricciones de Fondo</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Minimum Contrast (1-21)
+                    Contraste Mínimo (1-21)
                   </label>
                   <input
                     type="number"
@@ -630,13 +630,13 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
-                    WCAG: 4.5 recommended
+                    WCAG: 4.5 recomendado
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Inversion Threshold (0-1)
+                    Umbral Inversión (0-1)
                   </label>
                   <input
                     type="number"
@@ -648,13 +648,13 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
-                    Luminance to invert logo colors
+                    Luminancia para invertir colores del logo
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Max. Background Complexity (0-1)
+                    Máx. Complejidad Fondo (0-1)
                   </label>
                   <input
                     type="number"
@@ -666,13 +666,13 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                     className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
-                    Maximum allowed background complexity
+                    Complejidad máxima permitida del fondo
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Blur on Complex Background
+                    Blur si Fondo Complejo
                   </label>
                   <button
                     type="button"
@@ -683,10 +683,10 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                         : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
                     }`}
                   >
-                    {blurOverlayRequired ? '✓ Required' : '✗ Not required'}
+                    {blurOverlayRequired ? '✓ Requerido' : '✗ No requerido'}
                   </button>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Apply blur over complex backgrounds
+                    Aplicar blur sobre fondos complejos
                   </p>
                 </div>
               </div>
@@ -695,11 +695,11 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
           {/* Claims Section */}
           <div className="border-t border-neutral-800 pt-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Claims</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Afirmaciones (Claims)</h3>
             
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Banned Claim Phrases
+                Frases de Claims Prohibidas
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -707,11 +707,11 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
                   value={claimPhraseInput}
                   onChange={(e) => setClaimPhraseInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddClaimPhrase())}
-                  placeholder="E.g: 'the best', 'guaranteed 100%'"
+                  placeholder="Ej: 'el mejor', 'garantizado 100%'"
                   className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
                 />
                 <Button onClick={handleAddClaimPhrase} disabled={!claimPhraseInput.trim()}>
-                  Add
+                  Agregar
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -728,10 +728,10 @@ export const BrandRulesModal: React.FC<BrandRulesModalProps> = ({
 
         <div className="flex gap-3 justify-end mt-8 pt-6 border-t border-neutral-800">
           <Button onClick={onClose} disabled={loading}>
-            Cancel
+            Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Saving...' : (mode === 'edit' ? 'Save Changes' : 'Create Rules')}
+            {loading ? 'Guardando...' : (mode === 'edit' ? 'Guardar Cambios' : 'Crear Reglas')}
           </Button>
         </div>
       </div>

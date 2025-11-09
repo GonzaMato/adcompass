@@ -45,8 +45,3 @@ export type {
   BrandRulesInput,
 } from './brand-rules.types';
 
-// Evaluation types
-export type {
-  EvaluateRequestDTO,
-} from './evaluation.types';
-

@@ -8,7 +8,6 @@ import { Button } from "../components/Button";
 import { BrandRulesModal } from "../components/BrandRulesModal";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { brandRulesAPI } from "@/lib/api";
-import { useRouter } from "next/navigation";
 
 interface BrandRulesResponse {
   id: string;
@@ -81,7 +80,6 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
   selectedBrand,
   onBack,
 }) => {
-  const router = useRouter();
   const [allRules, setAllRules] = useState<BrandRulesResponse[]>([]);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
@@ -163,7 +161,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
 
   const handleContinue = () => {
     if (selectedRuleId) {
-      router.push(`/brands/${selectedBrand.id}/rules/${selectedRuleId}/evaluate`);
+      alert('Continuar con regla: ' + selectedRuleId);
     }
   };
 
@@ -177,12 +175,12 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Brand Selection
+          Volver a selección de marca
         </button>
       </div>
 
       <div className="text-center mb-12">
-        <Badge variant="success">Selected Brand</Badge>
+        <Badge variant="success">Marca Seleccionada</Badge>
         <h1 className="mt-4 text-4xl font-bold text-white">{selectedBrand.name}</h1>
         {selectedBrand.description && (
           <p className="mt-2 text-neutral-400">{selectedBrand.description}</p>
@@ -192,19 +190,19 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
       {loading ? (
         <div className="text-center text-neutral-400">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-          <p className="mt-4">Loading rules...</p>
+          <p className="mt-4">Cargando reglas...</p>
         </div>
       ) : error ? (
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <Button onClick={fetchRules}>Retry</Button>
+          <Button onClick={fetchRules}>Reintentar</Button>
         </div>
       ) : allRules.length > 0 ? (
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Brand Rules ({allRules.length})</h2>
+            <h2 className="text-2xl font-bold text-white">Reglas de la Marca ({allRules.length})</h2>
             <Button onClick={() => { setModalMode('create'); setEditingRule(null); setIsRulesModalOpen(true); }}>
-              Create New Rule
+              Crear Nueva Regla
             </Button>
           </div>
 
@@ -227,7 +225,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="text-white font-medium">
-                          Rule #{rule.id.slice(0, 8)}
+                          Regla #{rule.id.slice(0, 8)}
                         </h3>
                         <span className="text-xs text-neutral-500">
                           {new Date(rule.createdAt).toLocaleDateString()}
@@ -236,22 +234,22 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {(rule.rules.claims.bannedPhrases?.length ?? rule.rules.claims.bannedPatterns?.length ?? 0) > 0 && (
                           <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded">
-                            {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length} banned claims
+                            {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length} claims prohibidos
                           </span>
                         )}
                         {rule.rules.voice.lexicon.bannedWords.length > 0 && (
                           <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-300 rounded">
-                            {rule.rules.voice.lexicon.bannedWords.length} banned words
+                            {rule.rules.voice.lexicon.bannedWords.length} palabras prohibidas
                           </span>
                         )}
                         {rule.rules.logoUsage.placementGrid.length > 0 && (
                           <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded">
-                            {rule.rules.logoUsage.placementGrid.length} logo positions
+                            {rule.rules.logoUsage.placementGrid.length} posiciones logo
                           </span>
                         )}
                         {Object.keys(rule.rules.sensitive.policies).length > 0 && (
                           <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded">
-                            {Object.keys(rule.rules.sensitive.policies).length} sensitive policies
+                            {Object.keys(rule.rules.sensitive.policies).length} políticas sensibles
                           </span>
                         )}
                       </div>
@@ -266,7 +264,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                         setIsRulesModalOpen(true);
                       }}
                       className="text-blue-400 hover:text-blue-300 transition-colors p-2"
-                      title="Edit rule"
+                      title="Editar regla"
                     >
                       <svg
                         className="w-5 h-5"
@@ -283,7 +281,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                         handleAskDeleteRule(rule.id);
                       }}
                       className="text-red-400 hover:text-red-300 transition-colors p-2"
-                      title="Delete rule"
+                      title="Eliminar regla"
                     >
                       <svg 
                         className="w-5 h-5"
@@ -322,15 +320,15 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                           <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                           </svg>
-                          <h4 className="text-sm font-semibold text-white">Brand Voice</h4>
+                          <h4 className="text-sm font-semibold text-white">Voz de Marca</h4>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                           {[
-                            { label: 'Formality', value: rule.rules.voice.traits.formality, icon: '📐' },
-                            { label: 'Warmth', value: rule.rules.voice.traits.warmth, icon: '🔥' },
-                            { label: 'Energy', value: rule.rules.voice.traits.energy, icon: '⚡' },
+                            { label: 'Formalidad', value: rule.rules.voice.traits.formality, icon: '📐' },
+                            { label: 'Calidez', value: rule.rules.voice.traits.warmth, icon: '🔥' },
+                            { label: 'Energía', value: rule.rules.voice.traits.energy, icon: '⚡' },
                             { label: 'Humor', value: rule.rules.voice.traits.humor, icon: '😄' },
-                            { label: 'Confidence', value: rule.rules.voice.traits.confidence, icon: '💪' },
+                            { label: 'Confianza', value: rule.rules.voice.traits.confidence, icon: '💪' },
                           ].map((trait, idx) => (
                             <div key={idx} className="bg-neutral-900/50 rounded-lg p-3 text-center">
                               <div className="text-lg mb-1">{trait.icon}</div>
@@ -342,26 +340,26 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                   return normalized;
                                 })()}
                               </div>
-                              <div className="text-xs text-neutral-500 mt-1">of 10</div>
+                              <div className="text-xs text-neutral-500 mt-1">de 10</div>
                             </div>
                           ))}
                         </div>
                         
                         {/* Readability */}
                         <div className="mt-4 pt-4 border-t border-neutral-700/50">
-                          <h5 className="text-xs font-semibold text-neutral-400 mb-3">Readability</h5>
+                          <h5 className="text-xs font-semibold text-neutral-400 mb-3">Legibilidad</h5>
                           <div className="grid grid-cols-3 gap-3 text-xs">
                             <div className="bg-neutral-900/50 rounded p-2">
-                              <div className="text-neutral-500 mb-1">Reading Level</div>
+                              <div className="text-neutral-500 mb-1">Nivel de lectura</div>
                               <div className="text-white font-medium">{rule.rules.voice.lexicon.readability.targetGrade}</div>
                             </div>
                             <div className="bg-neutral-900/50 rounded p-2">
-                              <div className="text-neutral-500 mb-1">Max. Exclamations</div>
+                              <div className="text-neutral-500 mb-1">Máx. exclamaciones</div>
                               <div className="text-white font-medium">{rule.rules.voice.lexicon.readability.maxExclamations}</div>
                             </div>
                             <div className="bg-neutral-900/50 rounded p-2">
                               <div className="text-neutral-500 mb-1">Emojis</div>
-                              <div className="text-white font-medium">{rule.rules.voice.lexicon.readability.allowEmojis ? '✅ Yes' : '❌ No'}</div>
+                              <div className="text-white font-medium">{rule.rules.voice.lexicon.readability.allowEmojis ? '✅ Sí' : '❌ No'}</div>
                             </div>
                           </div>
                         </div>
@@ -374,12 +372,12 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                             <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                             </svg>
-                            <h4 className="text-sm font-semibold text-white">Language Restrictions</h4>
+                            <h4 className="text-sm font-semibold text-white">Restricciones de Lenguaje</h4>
                           </div>
                           <div className="space-y-3">
                             {rule.rules.voice.lexicon.bannedWords.length > 0 && (
                               <div>
-                                <p className="text-xs text-neutral-400 mb-2 font-medium">🚫 Banned Words ({rule.rules.voice.lexicon.bannedWords.length})</p>
+                                <p className="text-xs text-neutral-400 mb-2 font-medium">🚫 Palabras Prohibidas ({rule.rules.voice.lexicon.bannedWords.length})</p>
                                 <div className="flex flex-wrap gap-2">
                                   {rule.rules.voice.lexicon.bannedWords.slice(0, 10).map((word, idx) => (
                                     <span key={idx} className="px-2.5 py-1 bg-red-500/20 text-red-300 rounded-md text-xs font-medium border border-red-500/30">
@@ -388,7 +386,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                   ))}
                                   {rule.rules.voice.lexicon.bannedWords.length > 10 && (
                                     <span className="px-2.5 py-1 bg-neutral-700 text-neutral-400 rounded-md text-xs">
-                                      +{rule.rules.voice.lexicon.bannedWords.length - 10} more
+                                      +{rule.rules.voice.lexicon.bannedWords.length - 10} más
                                     </span>
                                   )}
                                 </div>
@@ -396,7 +394,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                             )}
                             {(rule.rules.voice.lexicon.bannedPhrases?.length ?? rule.rules.voice.lexicon.bannedPatterns?.length ?? 0) > 0 && (
                               <div>
-                                <p className="text-xs text-neutral-400 mb-2 font-medium">🔍 Banned Phrases ({(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length})</p>
+                                <p className="text-xs text-neutral-400 mb-2 font-medium">🔍 Frases Prohibidas ({(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length})</p>
                                 <div className="flex flex-wrap gap-2">
                                   {(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).slice(0, 8).map((phrase, idx) => (
                                     <span key={idx} className="px-2.5 py-1 bg-orange-500/20 text-orange-300 rounded-md text-xs font-medium border border-orange-500/30">
@@ -405,7 +403,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                   ))}
                                   {(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length > 8 && (
                                     <span className="px-2.5 py-1 bg-neutral-700 text-neutral-400 rounded-md text-xs">
-                                      +{(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length - 8} more
+                                      +{(rule.rules.voice.lexicon.bannedPhrases ?? rule.rules.voice.lexicon.bannedPatterns ?? []).length - 8} más
                                     </span>
                                   )}
                                 </div>
@@ -421,7 +419,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                           <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <h4 className="text-sm font-semibold text-white">Logo Usage</h4>
+                          <h4 className="text-sm font-semibold text-white">Uso del Logo</h4>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-3">
@@ -430,7 +428,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                 📏
                               </div>
                               <div>
-                                <div className="text-xs text-neutral-400">Minimum Size</div>
+                                <div className="text-xs text-neutral-400">Tamaño Mínimo</div>
                                 <div className="text-sm text-white font-medium">
                                   {rule.rules.logoUsage.minSizePx.width} × {rule.rules.logoUsage.minSizePx.height} px
                                 </div>
@@ -441,9 +439,9 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                 ↔️
                               </div>
                               <div>
-                                <div className="text-xs text-neutral-400">Clear Space</div>
+                                <div className="text-xs text-neutral-400">Espacio Libre</div>
                                 <div className="text-sm text-white font-medium">
-                                  {rule.rules.logoUsage.minClearSpaceX}× of logo
+                                  {rule.rules.logoUsage.minClearSpaceX}× del logo
                                 </div>
                               </div>
                             </div>
@@ -452,9 +450,9 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                 {rule.rules.logoUsage.aspectRatioLock ? '🔒' : '🔓'}
                               </div>
                               <div>
-                                <div className="text-xs text-neutral-400">Aspect Ratio</div>
+                                <div className="text-xs text-neutral-400">Aspecto</div>
                                 <div className="text-sm text-white font-medium">
-                                  {rule.rules.logoUsage.aspectRatioLock ? 'Locked' : 'Free'}
+                                  {rule.rules.logoUsage.aspectRatioLock ? 'Bloqueado' : 'Libre'}
                                 </div>
                               </div>
                             </div>
@@ -465,7 +463,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                 🎨
                               </div>
                               <div>
-                                <div className="text-xs text-neutral-400">Min. Contrast</div>
+                                <div className="text-xs text-neutral-400">Contraste Mínimo</div>
                                 <div className="text-sm text-white font-medium">
                                   {rule.rules.logoUsage.background.minContrastRatio}:1
                                 </div>
@@ -476,7 +474,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                 💫
                               </div>
                               <div>
-                                <div className="text-xs text-neutral-400">Max. Complexity</div>
+                                <div className="text-xs text-neutral-400">Complejidad Máx.</div>
                                 <div className="text-sm text-white font-medium">
                                   {(rule.rules.logoUsage.background.maxBackgroundComplexity * 100).toFixed(0)}%
                                 </div>
@@ -489,7 +487,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                               <div>
                                 <div className="text-xs text-neutral-400">Blur Overlay</div>
                                 <div className="text-sm text-white font-medium">
-                                  {rule.rules.logoUsage.background.blurOverlayRequiredAboveComplexity ? '✅ Required' : '❌ No'}
+                                  {rule.rules.logoUsage.background.blurOverlayRequiredAboveComplexity ? '✅ Requerido' : '❌ No'}
                                 </div>
                               </div>
                             </div>
@@ -497,7 +495,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                         </div>
                         {rule.rules.logoUsage.placementGrid.length > 0 && (
                           <div className="mt-4 pt-4 border-t border-purple-500/20">
-                            <p className="text-xs text-neutral-400 mb-2 font-medium">📍 Allowed Positions</p>
+                            <p className="text-xs text-neutral-400 mb-2 font-medium">📍 Posiciones Permitidas</p>
                             <div className="flex flex-wrap gap-2">
                               {rule.rules.logoUsage.placementGrid.map((pos, idx) => (
                                 <span key={idx} className="px-3 py-1.5 bg-purple-500/20 text-purple-300 rounded-md text-xs font-medium border border-purple-500/30">
@@ -516,7 +514,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                             <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            <h4 className="text-sm font-semibold text-white">Banned Claims</h4>
+                            <h4 className="text-sm font-semibold text-white">Claims Prohibidos</h4>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).slice(0, 12).map((phrase, idx) => (
@@ -526,7 +524,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                             ))}
                             {(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length > 12 && (
                               <span className="px-2.5 py-1 bg-neutral-700 text-neutral-400 rounded-md text-xs">
-                                +{(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length - 12} more
+                                +{(rule.rules.claims.bannedPhrases ?? rule.rules.claims.bannedPatterns ?? []).length - 12} más
                               </span>
                             )}
                           </div>
@@ -539,19 +537,19 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                           <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                           </svg>
-                          <h4 className="text-sm font-semibold text-white">Accessibility (WCAG)</h4>
+                          <h4 className="text-sm font-semibold text-white">Accesibilidad (WCAG)</h4>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                           <div className="bg-green-500/10 rounded-lg p-3">
-                            <div className="text-xs text-green-400 mb-1">Contrast</div>
+                            <div className="text-xs text-green-400 mb-1">Contraste</div>
                             <div className="text-lg font-bold text-white">{rule.rules.accessibility.wcag.minContrastRatio}:1</div>
                           </div>
                           <div className="bg-green-500/10 rounded-lg p-3">
-                            <div className="text-xs text-green-400 mb-1">Min. Font</div>
+                            <div className="text-xs text-green-400 mb-1">Fuente Mín.</div>
                             <div className="text-lg font-bold text-white">{rule.rules.accessibility.wcag.minFontSizePx}px</div>
                           </div>
                           <div className="bg-green-500/10 rounded-lg p-3">
-                            <div className="text-xs text-green-400 mb-1">Captions</div>
+                            <div className="text-xs text-green-400 mb-1">Subtítulos</div>
                             <div className="text-lg font-bold text-white">{rule.rules.accessibility.wcag.captionsRequired ? '✓' : '✗'}</div>
                           </div>
                           <div className="bg-green-500/10 rounded-lg p-3">
@@ -568,7 +566,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                             <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
-                            <h4 className="text-sm font-semibold text-white">Sensitive Policies</h4>
+                            <h4 className="text-sm font-semibold text-white">Políticas Sensibles</h4>
                           </div>
                           <div className="space-y-2">
                             {Object.entries(rule.rules.sensitive.policies).map(([key, policy]: [string, any]) => (
@@ -581,7 +579,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                                     ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
                                     : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
                                 )}>
-                                  {policy.allowed === 'allowed' ? '✓ Allowed' : policy.allowed === 'disallowed' ? '✗ Not Allowed' : '⚠ Conditional'}
+                                  {policy.allowed === 'allowed' ? '✓ Permitido' : policy.allowed === 'disallowed' ? '✗ No Permitido' : '⚠ Condicional'}
                                 </span>
                               </div>
                             ))}
@@ -598,7 +596,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
           {selectedRuleId && (
             <div className="flex justify-center">
               <Button onClick={handleContinue} className="px-8">
-                Continue with Selected Rule
+                Continuar con Regla Seleccionada
               </Button>
             </div>
           )}
@@ -621,13 +619,13 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
                 />
               </svg>
               <h3 className="text-xl font-semibold text-white">
-                No rules defined for this brand
+                No hay reglas definidas para esta marca
               </h3>
               <p className="text-neutral-400">
-                Create rules to define how this brand should be used in ads
+                Crea reglas para definir cómo debe usarse esta marca en anuncios
               </p>
               <Button onClick={() => { setModalMode('create'); setEditingRule(null); setIsRulesModalOpen(true); }}>
-                Create Rules
+                Crear Reglas
               </Button>
             </div>
           </Card>
@@ -645,10 +643,10 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
 
       <ConfirmDialog
         isOpen={confirmOpen}
-        title="Delete rule"
-        message={`Delete rule ${deletingRuleId ? '#' + deletingRuleId.slice(0, 8) : ''}? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        title="Eliminar regla"
+        message={`¿Eliminar la regla ${deletingRuleId ? '#' + deletingRuleId.slice(0, 8) : ''}? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
         loading={loading && !!deletingRuleId}
         onCancel={() => {
           if (loading && deletingRuleId) return;
@@ -669,7 +667,7 @@ export const SelectBrandRulesSection: React.FC<SelectBrandRulesSectionProps> = (
             setDeletingRuleId(null);
           } catch (err) {
             console.error('Error deleting rule:', err);
-            alert(err instanceof Error ? err.message : 'Error deleting the rule');
+            alert(err instanceof Error ? err.message : 'Error al eliminar la regla');
           } finally {
             setLoading(false);
           }

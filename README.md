@@ -122,19 +122,11 @@ export async function POST(request: Request) {
 Puedes personalizar el comportamiento con esta variable en `.env.local`:
 
 - `MOCK_BASE_URL` - URL del mock server (default: `http://localhost:4010`)
-- `N8N_EVALUATE_URL` - URL del workflow de n8n para evaluar (POST)
-- `N8N_FIX_URL` - URL del workflow de n8n para corregir (POST)
-- `EVALUATE_TIMEOUT_MS` - (opcional) timeout para evaluar, en ms (default: 12000)
-- `FIX_TIMEOUT_MS` - (opcional) timeout para corregir, en ms (default: 12000)
 
 Ejemplo `.env.local`:
 
 ```bash
 MOCK_BASE_URL=http://localhost:4010
-N8N_EVALUATE_URL=https://n8n.example.com/webhook/evaluate
-N8N_FIX_URL=https://n8n.example.com/webhook/fix
-EVALUATE_TIMEOUT_MS=12000
-FIX_TIMEOUT_MS=12000
 ```
 
 ### Endpoints Disponibles

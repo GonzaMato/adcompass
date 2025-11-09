@@ -21,7 +21,6 @@ model Brand {
   logos     Logo[]
   taglines  Tagline[]
   brandRules BrandRules[]
-  evaluations Evaluation[]
 
   @@map("brands")
 }
@@ -79,38 +78,4 @@ model BrandRules {
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@map("brand_rules")
-}
-
-model Evaluation {
-  id        String   @id @default(uuid()) @db.Uuid
-  brandId   String   @db.Uuid
-  ruleId    String   @db.Uuid
-  // New fields for generic asset support
-  assetUrl  String   @db.VarChar(500)
-  assetType String   @db.VarChar(10) // 'IMAGE' | 'VIDEO'
-  context   String?  @db.Text
-
-  // Legacy imageUrl kept optional for compatibility
-  imageUrl  String?  @db.VarChar(500)
-  result    Json
-  createdAt DateTime @default(now()) @map("created_at")
-
-  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  results EvaluationResult[]
-
-  @@map("evaluations")
-  @@index([brandId], map: "idx_evaluations_brand_id")
-}
-
-model EvaluationResult {
-  id            String     @id @default(uuid()) @db.Uuid
-  evaluationId  String     @db.Uuid
-  url           String     @db.VarChar(500)
-  payload       Json?
-  createdAt     DateTime   @default(now()) @map("created_at")
-
-  evaluation Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
-
-  @@map("evaluation_results")
-  @@index([evaluationId], map: "idx_eval_results_evaluation_id")
 }

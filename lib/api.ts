@@ -117,38 +117,3 @@ export const brandRulesAPI = {
       method: 'DELETE',
     }),
 };
-// Evaluation API endpoints
-export const evaluationAPI = {
-  evaluateMultipart: (params: { brandId: string; ruleId: string; file: File; context?: string }) => {
-    const form = new FormData();
-    form.append('brandId', params.brandId);
-    form.append('ruleId', params.ruleId);
-    form.append('asset', params.file);
-    if (params.context) form.append('context', params.context);
-    return apiFormRequest<any>('/evaluate', form);
-  },
-
-  evaluateJson: (payload: {
-    brandId: string;
-    ruleId: string;
-    assetUrl?: string;
-    assetType?: 'IMAGE' | 'VIDEO';
-    context?: string;
-    imageUrl?: string; // legacy
-  }) => {
-    return apiRequest<any>('/evaluate', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-  },
-
-  fix: (evaluationId: string) => {
-    return apiRequest<any>(`/evaluations/${evaluationId}/fix`, {
-      method: 'POST',
-    });
-  },
-
-  getResults: (evaluationId: string) => {
-    return apiRequest<{ results: any[] }>(`/evaluations/${evaluationId}/results`);
-  },
-};

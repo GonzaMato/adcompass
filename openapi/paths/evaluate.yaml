@@ -9,12 +9,7 @@ evaluate:
       content:
         application/json:
           schema:
-            oneOf:
-              - $ref: '../schemas/Evaluation.yaml#/EvaluateJsonInput'
-              - $ref: '../schemas/Evaluation.yaml#/EvaluationInput' # legacy mock shape
-        multipart/form-data:
-          schema:
-            $ref: '../schemas/Evaluation.yaml#/EvaluateMultipartInput'
+            $ref: '../schemas/Evaluation.yaml#/EvaluationInput'
     responses:
       '200':
         description: Evaluation completed successfully
