@@ -283,6 +283,115 @@ describe('BrandService', () => {
   });
 
   describe('updateBrand', () => {
+    it('should keep existing logos by URL and add new ones (combined)', async () => {
+      const id = 'brand-id';
+      const input = {
+        existingLogoUrls: ['https://gcs/brands/brand-id/existing.svg'],
+        logos: [{ type: 'primary' as const }],
+        logoFiles: [{
+          name: 'new.svg',
+          type: 'image/svg+xml',
+          size: 1000,
+          buffer: Buffer.from('x'),
+        }],
+      };
+
+      (mockRepository.findById as jest.Mock).mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        colors: [],
+        logos: [{
+          id: 10,
+          brandId: id,
+          type: 'primary',
+          url: 'https://gcs/brands/brand-id/existing.svg',
+          mime: 'image/svg+xml',
+          sizeBytes: 100,
+          widthPx: null,
+          heightPx: null,
+          minClearSpaceRatio: null,
+          allowedPositions: null,
+          bannedBackgrounds: null,
+          monochrome: null,
+          invertOnDark: null,
+        }],
+        taglines: [],
+      } as any);
+
+      mockStorage.uploadLogo.mockResolvedValue({
+        url: 'https://gcs/brands/brand-id/new.svg',
+        sizeBytes: 1000,
+        mime: 'image/svg+xml',
+      });
+
+      mockRepository.updateWithRelations.mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        colors: [],
+        logos: [{
+          id: 10, brandId: id, type: 'primary', url: 'https://gcs/brands/brand-id/existing.svg', mime: 'image/svg+xml',
+        }, {
+          id: 11, brandId: id, type: 'primary', url: 'https://gcs/brands/brand-id/new.svg', mime: 'image/svg+xml',
+        }],
+        taglines: [],
+      } as any);
+
+      const result = await brandService.updateBrand(id, input as any);
+
+      expect(result?.logos.length).toBe(2);
+      expect(mockRepository.updateWithRelations).toHaveBeenCalledWith(id, expect.objectContaining({
+        logos: expect.arrayContaining([
+          expect.objectContaining({ url: 'https://gcs/brands/brand-id/existing.svg' }),
+          expect.objectContaining({ url: 'https://gcs/brands/brand-id/new.svg' }),
+        ]),
+      }));
+    });
+
+    it('should throw ValidationError when existingLogoUrls contains unknown url', async () => {
+      const id = 'brand-id';
+      (mockRepository.findById as jest.Mock).mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        colors: [], logos: [], taglines: [],
+      } as any);
+
+      await expect(brandService.updateBrand(id, {
+        existingLogoUrls: ['https://gcs/brands/brand-id/unknown.svg'],
+        logoFiles: [],
+      } as any)).rejects.toThrow(ValidationError);
+    });
+
+    it('should keep logos unchanged when neither existingLogoUrls nor logos provided', async () => {
+      const id = 'brand-id';
+      (mockRepository.findById as jest.Mock).mockResolvedValue({
+        id,
+        name: 'Existing',
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        colors: [], logos: [], taglines: [],
+      } as any);
+
+      mockRepository.updateWithRelations.mockResolvedValue({
+        id, name: 'Existing', description: null, createdAt: new Date(), updatedAt: new Date(), colors: [], logos: [], taglines: [],
+      } as any);
+
+      await brandService.updateBrand(id, { colors: [], taglinesAllowed: [], logoFiles: [] } as any);
+
+      expect(mockRepository.updateWithRelations).toHaveBeenCalledWith(id, expect.objectContaining({
+        logos: undefined,
+      }));
+    });
+
     it('should update brand kit successfully', async () => {
       const id = 'test-brand-id';
       const input = {
@@ -401,6 +510,23 @@ describe('BrandService', () => {
           buffer: Buffer.from('test'),
         }],
       })).rejects.toThrow(ValidationError);
+    });
+  });
+
+  describe('deleteBrand', () => {
+    it('should delete brand and storage assets', async () => {
+      const id = 'brand-id';
+      (mockRepository.findById as jest.Mock).mockResolvedValue({ id } as any);
+
+      await brandService.deleteBrand(id);
+
+      expect(mockStorage.deleteLogos).toHaveBeenCalledWith(id);
+      expect(mockRepository.delete).toHaveBeenCalledWith(id);
+    });
+
+    it('should throw NotFoundError when brand not found', async () => {
+      (mockRepository.findById as jest.Mock).mockResolvedValue(null);
+      await expect(brandService.deleteBrand('missing')).rejects.toThrow(NotFoundError);
     });
   });
 
