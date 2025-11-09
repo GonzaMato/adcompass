@@ -78,9 +78,10 @@ export default function DemoPage() {
       if (modalMode === 'create') {
         await brandsAPI.create(formData);
       } else {
-        // Edit mode would need a different approach
-        // For now, we only support create with files
-        throw new Error('La edición de marcas aún no está implementada');
+        if (!editingBrand?.id) {
+          throw new Error('No se encontró el ID de la marca a editar');
+        }
+        await brandsAPI.update(editingBrand.id, formData);
       }
 
       // Refresh brands list
@@ -148,8 +149,6 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
-      <BackgroundBeams />
-      
       <div className="relative z-10 p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -245,15 +244,6 @@ export default function DemoPage() {
                             >
                               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={(e) => handleDeleteBrand(brand.id, e)}
-                              className="w-8 h-8 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center transition-colors shadow-lg"
-                              title="Eliminar marca"
-                            >
-                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
                             </button>
                           </div>

@@ -137,17 +137,17 @@ export class BrandService {
       throw error;
     }
 
-    // Validate logo files count matches logos array
-    if (input.logoFiles.length !== input.logos.length) {
-      throw new ValidationError(
-        `Expected ${input.logos.length} logo files, but received ${input.logoFiles.length}`
-      );
-    }
-
     // Ensure brand exists before uploading
     const existingBrand = await this.repository.findById(id);
     if (!existingBrand) {
       throw new NotFoundError('Brand not found');
+    }
+
+    // Validate logo files count matches logos array
+    if (input.logos && input.logoFiles.length !== input.logos.length) {
+      throw new ValidationError(
+        `Expected ${input.logos.length} logo files, but received ${input.logoFiles.length}`
+      );
     }
 
     // Validate each logo file

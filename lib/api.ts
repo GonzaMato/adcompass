@@ -33,12 +33,13 @@ export async function apiRequest<T>(
 // API Client helper for FormData requests (multipart)
 export async function apiFormRequest<T>(
   endpoint: string,
-  formData: FormData
+  formData: FormData,
+  method: 'POST' | 'PUT' = 'POST'
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const response = await fetch(url, {
-    method: 'POST',
+    method,
     body: formData,
     // Don't set Content-Type header - browser will set it with boundary
   });
@@ -61,11 +62,8 @@ export const brandsAPI = {
   
   create: (formData: FormData) => apiFormRequest<any>('/brands', formData),
   
-  update: (id: string, data: any) =>
-    apiRequest<any>(`/brands/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
+  update: (id: string, formData: FormData) =>
+    apiFormRequest<any>(`/brands/${id}`, formData, 'PUT'),
   
   delete: (id: string) =>
     apiRequest<void>(`/brands/${id}`, {

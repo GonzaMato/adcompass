@@ -46,35 +46,42 @@ export const BrandModal: React.FC<BrandModalProps> = ({
   const [newLogoType, setNewLogoType] = useState<'primary' | 'stacked' | 'mark-only' | 'mono' | 'inverted'>('primary');
   const [newTagline, setNewTagline] = useState('');
 
+  // Initialize form when modal opens - only on transition from closed to open
   useEffect(() => {
-    if (brand && mode === 'edit') {
-      setName(brand.name);
-      setDescription(brand.description || '');
-      setColors(brand.colors || []);
-      setTaglines(brand.taglinesAllowed || []);
-      
-      // Load existing logos
-      if (brand.logos && brand.logos.length > 0) {
-        const existingLogos: LogoWithFile[] = brand.logos.map(logo => ({
-          type: logo.type as 'primary' | 'stacked' | 'mark-only' | 'mono' | 'inverted',
-          file: null,
-          preview: logo.url,
-          invertOnDark: logo.invertOnDark || false,
-          existingUrl: logo.url,
-          isExisting: true
-        }));
-        setLogos(existingLogos);
-      } else {
+    if (isOpen) {
+      if (brand && mode === 'edit') {
+        setName(brand.name);
+        setDescription(brand.description || '');
+        setColors(brand.colors || []);
+        setTaglines(brand.taglinesAllowed || []);
+        
+        // Load existing logos (without files, just for display)
+        if (brand.logos && brand.logos.length > 0) {
+          const existingLogos: LogoWithFile[] = brand.logos.map(logo => ({
+            type: logo.type as 'primary' | 'stacked' | 'mark-only' | 'mono' | 'inverted',
+            file: null,
+            preview: logo.url,
+            invertOnDark: logo.invertOnDark || false,
+            existingUrl: logo.url,
+            isExisting: true
+          }));
+          setLogos(existingLogos);
+        } else {
+          setLogos([]);
+        }
+      } else if (mode === 'create') {
+        setName('');
+        setDescription('');
+        setColors([]);
         setLogos([]);
+        setTaglines([]);
       }
-    } else {
-      setName('');
-      setDescription('');
-      setColors([]);
-      setLogos([]);
-      setTaglines([]);
+      
+      // Clear error when modal opens
+      setError(null);
     }
-  }, [brand, mode, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // Only reset when isOpen changes (modal opens/closes)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,17 +92,17 @@ export const BrandModal: React.FC<BrandModalProps> = ({
     }
 
     if (logos.length === 0) {
-      setError('Debes agregar al menos un logo');
+      setError('Debes tener al menos un logo');
       return;
     }
 
     // In create mode, all logos must have files
-    // In edit mode, only new logos need files (existing ones are already uploaded)
     if (mode === 'create' && logos.some(l => !l.file)) {
       setError('Todos los logos deben tener un archivo');
       return;
     }
     
+    // In edit mode, only new logos (not existing) need files
     if (mode === 'edit' && logos.some(l => !l.isExisting && !l.file)) {
       setError('Los logos nuevos deben tener un archivo');
       return;
@@ -107,31 +114,60 @@ export const BrandModal: React.FC<BrandModalProps> = ({
     try {
       const formData = new FormData();
       
+      // Always send name and description
       formData.append('name', name);
       if (description) {
         formData.append('description', description);
       }
       
+      // Send colors
       if (colors.length > 0) {
         formData.append('colors', JSON.stringify(colors));
       }
       
-      const logosMetadata = logos.map(logo => ({
-        type: logo.type,
-        invertOnDark: logo.invertOnDark || false
-      }));
-      formData.append('logos', JSON.stringify(logosMetadata));
-      
-      logos.forEach((logo, index) => {
-        if (logo.file) {
-          formData.append(`logoFile${index}`, logo.file);
-        }
-      });
-      
+      // Send taglines
       if (taglines.length > 0) {
         formData.append('taglinesAllowed', JSON.stringify(taglines));
       }
-
+      
+      // Check if we have new logos (logos with files)
+      const hasNewLogos = logos.some(logo => logo.file);
+      
+      if (mode === 'create' || (mode === 'edit' && hasNewLogos)) {
+        if (mode === 'edit' && hasNewLogos) {
+          // EDIT mode with new logos: send ONLY the new logos (with files)
+          // This replaces ALL existing logos
+          const newLogos = logos.filter(logo => logo.file);
+          
+          const logosMetadata = newLogos.map(logo => ({
+            type: logo.type,
+            invertOnDark: logo.invertOnDark || false,
+          }));
+          formData.append('logos', JSON.stringify(logosMetadata));
+          
+          // Send all new logo files
+          newLogos.forEach((logo, index) => {
+            if (logo.file) {
+              formData.append(`logoFile${index}`, logo.file);
+            }
+          });
+        } else {
+          // CREATE mode: send all logos with files
+          const logosMetadata = logos.map(logo => ({
+            type: logo.type,
+            invertOnDark: logo.invertOnDark || false,
+          }));
+          formData.append('logos', JSON.stringify(logosMetadata));
+          
+          logos.forEach((logo, index) => {
+            if (logo.file) {
+              formData.append(`logoFile${index}`, logo.file);
+            }
+          });
+        }
+      }
+      // In EDIT mode without new logos, don't send logos field to keep existing logos unchanged
+      
       await onSave(formData);
       onClose();
     } catch (err) {
@@ -169,13 +205,30 @@ export const BrandModal: React.FC<BrandModalProps> = ({
       return;
     }
 
+    // In edit mode, warn if there are existing logos
+    if (mode === 'edit') {
+      const hasExistingLogos = logos.some(logo => logo.isExisting);
+      if (hasExistingLogos) {
+        const confirmed = confirm(
+          '⚠️ Al agregar un nuevo logo, deberás subir TODOS los logos que quieras mantener.\n\n' +
+          'Los logos existentes que no vuelvas a subir se eliminarán.\n\n' +
+          '¿Deseas continuar?'
+        );
+        if (!confirmed) {
+          e.target.value = '';
+          return;
+        }
+      }
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const newLogo: LogoWithFile = {
         type: newLogoType,
         file,
         preview: event.target?.result as string,
-        invertOnDark: false
+        invertOnDark: false,
+        isExisting: false
       };
       setLogos(prev => [...prev, newLogo]);
       setError(null);
@@ -351,11 +404,27 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                           {logo.invertOnDark && ' • Invierte en oscuro'}
                         </div>
                       </div>
-                      <button type="button" onClick={() => removeLogo(index)} className="text-red-400 hover:text-red-300">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      {logos.length > 1 ? (
+                        <button 
+                          type="button" 
+                          onClick={() => removeLogo(index)} 
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                          title="Eliminar logo"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <div 
+                          className="text-neutral-600 cursor-not-allowed" 
+                          title="Debe haber al menos un logo"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -376,11 +445,15 @@ export const BrandModal: React.FC<BrandModalProps> = ({
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  Subir archivo (SVG o PNG)
+                  {mode === 'edit' ? 'Agregar nuevo logo' : 'Subir archivo (SVG o PNG)'}
                   <input type="file" accept="image/svg+xml,image/png" onChange={handleLogoFileChange} className="hidden" />
                 </label>
               </div>
-              <p className="text-xs text-neutral-500 mt-1">Máximo 5MB por archivo</p>
+              <p className="text-xs text-neutral-500 mt-1">
+                {mode === 'edit' 
+                  ? '⚠️ Para cambiar logos: elimina todos los existentes y sube los nuevos. Los cambios reemplazan todos los logos.' 
+                  : 'Máximo 5MB por archivo. Debe haber al menos un logo.'}
+              </p>
             </div>
 
             <div className="mb-6">
