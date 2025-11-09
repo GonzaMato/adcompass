@@ -96,7 +96,21 @@ model Evaluation {
   createdAt DateTime @default(now()) @map("created_at")
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  results EvaluationResult[]
 
   @@map("evaluations")
   @@index([brandId], map: "idx_evaluations_brand_id")
+}
+
+model EvaluationResult {
+  id            String     @id @default(uuid()) @db.Uuid
+  evaluationId  String     @db.Uuid
+  url           String     @db.VarChar(500)
+  payload       Json?
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@map("evaluation_results")
+  @@index([evaluationId], map: "idx_eval_results_evaluation_id")
 }

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card } from "@/app/components/Card";
 import { BackgroundGradient } from "@/app/components/ui/BackgroundGradient";
 import { Badge } from "@/app/components/Badge";
+import { evaluationAPI } from "@/lib/api";
 
 type Props = {
   brandName: string | null;
@@ -82,6 +84,45 @@ export default function ResultsScreenImage({
   };
 
   const data = parseEvaluationData();
+  const evaluationId = data.evaluation_id || "";
+
+  // Fix flow state
+  const [isFixing, setIsFixing] = useState(false);
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
+  const [results, setResults] = useState<Array<{ id: string; url: string; createdAt: string }>>([]);
+
+  const loadResults = async () => {
+    if (!evaluationId) return;
+    setIsLoadingResults(true);
+    try {
+      const response = await evaluationAPI.getResults(evaluationId);
+      setResults(response?.results ?? []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingResults(false);
+    }
+  };
+
+  const handleFix = async () => {
+    if (!evaluationId) return;
+    setIsFixing(true);
+    try {
+      await evaluationAPI.fix(evaluationId);
+      await loadResults();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsFixing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (evaluationId) {
+      loadResults();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [evaluationId]);
   
   // Extract scores
   const overallScore = data.scores?.OverallScore 
@@ -714,6 +755,54 @@ export default function ResultsScreenImage({
             </Card>
           </BackgroundGradient>
         </details>
+
+        {/* Fix results */}
+        {!!evaluationId && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <span className="text-3xl">🛠️</span>
+                Fix Results
+              </h2>
+              <button
+                onClick={handleFix}
+                disabled={isFixing}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-md transition-colors"
+              >
+                {isFixing ? 'Fixing…' : 'Fix'}
+              </button>
+            </div>
+
+            {isLoadingResults && (
+              <div className="text-neutral-400">Loading results…</div>
+            )}
+
+            {!isLoadingResults && results.length === 0 && (
+              <div className="text-neutral-500">No fix results yet.</div>
+            )}
+
+            {results.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {results.map((r) => (
+                  <BackgroundGradient key={r.id}>
+                    <Card className="bg-neutral-900 border-neutral-800 p-4 flex flex-col gap-2">
+                      <div className="text-xs text-neutral-500">Created</div>
+                      <div className="text-sm text-neutral-300">{new Date(r.createdAt).toLocaleString()}</div>
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-400 hover:text-blue-300 underline break-all"
+                      >
+                        {r.url}
+                      </a>
+                    </Card>
+                  </BackgroundGradient>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex justify-center gap-4">

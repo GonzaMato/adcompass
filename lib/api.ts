@@ -141,4 +141,14 @@ export const evaluationAPI = {
       body: JSON.stringify(payload),
     });
   },
+
+  fix: (evaluationId: string) => {
+    return apiRequest<any>(`/evaluations/${evaluationId}/fix`, {
+      method: 'POST',
+    });
+  },
+
+  getResults: (evaluationId: string) => {
+    return apiRequest<{ results: any[] }>(`/evaluations/${evaluationId}/results`);
+  },
 };
